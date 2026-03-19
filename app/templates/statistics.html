@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}数据统计 - 学员管理系统{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-chart-pie"></i>数据统计</h4>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-users me-2" style="color:#4f46e5;"></i>学员状态分布
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <canvas id="statusChart" style="max-height:280px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-book-open me-2" style="color:#10b981;"></i>课程报名统计
+            </div>
+            <div class="card-body d-flex align-items-center justify-content-center">
+                <canvas id="courseChart" style="max-height:280px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 出勤率统计 -->
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-calendar-check me-2" style="color:#f59e0b;"></i>课程出勤率统计
+            </div>
+            <div class="card-body">
+                <canvas id="attendanceChart" style="max-height:300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chart.umd.min.js') }}"></script>
+<script>
+$(function(){
+    // 加载图表数据
+    $.get('/api/statistics/charts', function(res){
+        if(res.code === 0){
+            renderStatusChart(res.data.student_status);
+            renderCourseChart(res.data.course_enrollment);
+            renderAttendanceChart(res.data.attendance_rate);
+        }
+    });
+});
+
+function renderStatusChart(data){
+    var labels = Object.keys(data);
+    var values = Object.values(data);
+    if(labels.length === 0){ $('#statusChart').parent().html('<p class="text-muted">暂无数据</p>'); return; }
+
+    new Chart($('#statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: ['#4f46e5','#f59e0b','#10b981','#ef4444'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+}
+
+function renderCourseChart(data){
+    var labels = Object.keys(data);
+    var values = Object.values(data);
+    if(labels.length === 0){ $('#courseChart').parent().html('<p class="text-muted">暂无数据</p>'); return; }
+
+    new Chart($('#courseChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '报名人数',
+                data: values,
+                backgroundColor: '#4f46e5',
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+        }
+    });
+}
+
+function renderAttendanceChart(data){
+    if(!data || Object.keys(data).length === 0){
+        $('#attendanceChart').parent().html('<p class="text-muted text-center py-4">暂无出勤数据</p>');
+        return;
+    }
+    var labels = Object.keys(data);
+    var values = Object.values(data);
+
+    new Chart($('#attendanceChart'), {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '出勤率 (%)',
+                data: values,
+                backgroundColor: values.map(function(v){ return v >= 80 ? '#10b981' : (v >= 60 ? '#f59e0b' : '#ef4444'); }),
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, max: 100, ticks: { callback: function(v){ return v + '%'; } } } }
+        }
+    });
+}
+</script>
+{% endblock %}

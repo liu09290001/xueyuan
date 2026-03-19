@@ -1,0 +1,217 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-API-AUTH-001,接口,认证授权,POST /api/login-正常登录-应返回200,数据库存在admin用户,步骤1:调用POST /api/login,"username=admin,password=admin123","预期1:状态码200,响应包含token,token非空",P0,自动化
+TC-API-AUTH-002,接口,认证授权,POST /api/login-密码错误-应返回401,数据库存在admin用户,步骤1:调用POST /api/login,"username=admin,password=wrong","预期1:状态码401,msg包含密码错误",P0,自动化
+TC-API-AUTH-003,接口,认证授权,POST /api/login-用户不存在-应返回401,无,步骤1:调用POST /api/login,"username=notexist,password=any","预期1:状态码401,msg包含用户不存在",P0,自动化
+TC-API-AUTH-004,接口,认证授权,POST /api/login-用户名为空-应返回400,无,步骤1:调用POST /api/login,"username=,password=admin123","预期1:状态码400,msg包含用户名不能为空",P0,自动化
+TC-API-AUTH-005,接口,认证授权,POST /api/login-密码为空-应返回400,无,步骤1:调用POST /api/login,"username=admin,password=","预期1:状态码400,msg包含密码不能为空",P0,自动化
+TC-API-AUTH-006,接口,认证授权,POST /api/logout-正常登出-应返回200,已登录,步骤1:调用POST /api/logout,携带有效token,"预期1:状态码200,msg为登出成功",P0,自动化
+TC-API-AUTH-007,接口,认证授权,GET /api/students-未登录访问-应返回401,无token,步骤1:调用GET /api/students,不携带token,"预期1:状态码401,msg包含未登录",P0,自动化
+TC-API-AUTH-008,接口,认证授权,GET /api/students-Token过期-应返回401,token已过期,步骤1:调用GET /api/students,携带过期token,"预期1:状态码401,msg包含token过期",P0,自动化
+TC-API-STU-001,接口,学员管理,POST /api/students-正常创建-应返回201,已登录,步骤1:调用POST /api/students,"name=张三,gender=男,age=20,phone=13800138000","预期1:状态码201,包含student_id,数据库存在记录",P0,自动化
+TC-API-STU-002,接口,学员管理,POST /api/students-姓名为空-应返回400,已登录,步骤1:调用POST /api/students,"name=,gender=男,age=20","预期1:状态码400,msg包含姓名不能为空",P0,自动化
+TC-API-STU-003,接口,学员管理,POST /api/students-手机号格式错误-应返回400,已登录,步骤1:调用POST /api/students,"name=张三,phone=123","预期1:状态码400,msg包含手机号格式错误",P0,自动化
+TC-API-STU-004,接口,学员管理,POST /api/students-年龄为0-应返回400,已登录,步骤1:调用POST /api/students,"name=张三,age=0","预期1:状态码400,msg包含年龄必须大于0",P0,自动化
+TC-API-STU-005,接口,学员管理,POST /api/students-年龄负数-应返回400,已登录,步骤1:调用POST /api/students,"name=张三,age=-1","预期1:状态码400,msg包含年龄必须大于0",P0,自动化
+TC-API-STU-006,接口,学员管理,GET /api/students-分页查询-应返回200,已登录,步骤1:调用GET /api/students,"page=1,per_page=10","预期1:状态码200,包含total/page/items",P0,自动化
+TC-API-STU-007,接口,学员管理,GET /api/students-按状态筛选-应返回200,已登录,步骤1:调用GET /api/students,status=在读,"预期1:状态码200,返回学员状态均为在读",P0,自动化
+TC-API-STU-008,接口,学员管理,GET /api/students-关键词搜索-应返回200,已登录,步骤1:调用GET /api/students,keyword=张三,"预期1:状态码200,返回姓名包含张三",P0,自动化
+TC-API-STU-009,接口,学员管理,GET /api/students/:id-正常查询-应返回200,已登录且学员存在,步骤1:调用GET /api/students/1,无,"预期1:状态码200,返回学员完整信息",P0,自动化
+TC-API-STU-010,接口,学员管理,GET /api/students/:id-不存在-应返回404,已登录,步骤1:调用GET /api/students/99999,无,"预期1:状态码404,msg包含学员不存在",P0,自动化
+TC-API-STU-011,接口,学员管理,PUT /api/students/:id-正常更新-应返回200,已登录且学员存在,步骤1:调用PUT /api/students/1,"name=张三修改,age=21","预期1:状态码200,数据库已更新",P0,自动化
+TC-API-STU-012,接口,学员管理,PATCH /api/students/:id/status-在读到休学-应返回200,已登录且学员状态为在读,步骤1:调用PATCH /api/students/1/status,status=休学,"预期1:状态码200,数据库状态为休学",P0,自动化
+TC-API-STU-013,接口,学员管理,PATCH /api/students/:id/status-结业到在读-应返回400,已登录且学员状态为结业,步骤1:调用PATCH /api/students/1/status,status=在读,"预期1:状态码400,msg包含非法状态流转",P0,自动化
+TC-API-STU-014,接口,学员管理,DELETE /api/students/:id-正常删除-应返回200,已登录且学员无报名,步骤1:调用DELETE /api/students/1,无,"预期1:状态码200,数据库已删除",P0,自动化
+TC-API-STU-015,接口,学员管理,DELETE /api/students/:id-有报名记录-应返回409,已登录且学员有报名,步骤1:调用DELETE /api/students/1,无,"预期1:状态码409,msg包含存在报名记录",P0,自动化
+TC-API-STU-016,接口,学员管理,POST /api/students-手机号重复-应拒绝,已登录且手机号已存在,步骤1:调用POST /api/students,"name=李四,phone=13800138000","预期1:状态码409,msg包含手机号已存在",P0,自动化
+TC-API-STU-017,接口,学员管理,POST /api/students-紧急联系人手机格式错误-应拒绝,已登录,步骤1:调用POST /api/students,"name=张三,emergency_phone=123","预期1:状态码400,msg包含紧急联系人手机格式错误",P0,自动化
+TC-API-STU-018,接口,学员管理,GET /api/students-组合筛选-应返回200,已登录,步骤1:调用GET /api/students,"status=在读,keyword=张","预期1:状态码200,返回在读且姓名包含张的学员",P0,自动化
+TC-API-STU-019,接口,学员管理,GET /api/students-空结果-应返回200,已登录,步骤1:调用GET /api/students,keyword=不存在的学员,"预期1:状态码200,items为空数组,total=0",P0,自动化
+TC-API-STU-020,接口,学员管理,PUT /api/students/:id-手机号重复-应拒绝,已登录,步骤1:调用PUT /api/students/1,phone=已存在的手机号,"预期1:状态码409,msg包含手机号已存在",P0,自动化
+TC-API-STU-021,接口,学员管理,PUT /api/students/:id-仅更新部分字段-应成功,已登录且学员存在,步骤1:调用PUT /api/students/1,age=22,"预期1:状态码200,仅age更新,其他字段不变",P0,自动化
+TC-API-STU-022,接口,学员管理,PATCH /api/students/:id/status-休学到结业-应拒绝,已登录且学员状态为休学,步骤1:调用PATCH /api/students/1/status,status=结业,"预期1:状态码400,msg包含非法状态流转",P0,自动化
+TC-API-STU-023,接口,学员管理,PATCH /api/students/:id/status-在读到退学-应成功,已登录且学员状态为在读,步骤1:调用PATCH /api/students/1/status,status=退学,"预期1:状态码200,数据库状态为退学",P0,自动化
+TC-API-STU-024,接口,学员管理,POST /api/students/import-部分失败-应返回详情,已登录,步骤1:调用POST /api/students/import,Excel包含10条,其中3条格式错误,"预期1:状态码200,success_count=7,fail_count=3,返回错误详情",P0,自动化
+TC-API-STU-025,接口,学员管理,POST /api/students/import-全部失败-应返回错误,已登录,步骤1:调用POST /api/students/import,Excel全部格式错误,"预期1:状态码200,success_count=0,返回所有错误",P0,自动化
+TC-API-STU-026,接口,学员管理,GET /api/students/export-按状态导出-应返回200,已登录,步骤1:调用GET /api/students/export,status=在读,"预期1:状态码200,Excel仅包含在读学员",P1,自动化
+TC-API-STU-027,接口,学员管理,GET /api/students/export-空数据导出-应返回空文件,已登录且无学员,步骤1:调用GET /api/students/export,无,"预期1:状态码200,Excel仅包含表头",P1,自动化
+TC-API-STU-028,接口,学员管理,GET /api/students/count-统计总数-应返回200,已登录,步骤1:调用GET /api/students/count,无,"预期1:状态码200,返回学员总数",P0,自动化
+TC-API-STU-029,接口,学员管理,GET /api/students/count-按状态统计-应返回200,已登录,步骤1:调用GET /api/students/count,group_by=status,"预期1:状态码200,返回各状态学员数",P0,自动化
+TC-API-STU-030,接口,学员管理,POST /api/students-姓名超长-应拒绝,已登录,步骤1:调用POST /api/students,name=100个字符,"预期1:状态码400,msg包含姓名长度超限",P0,自动化
+TC-API-CRS-001,接口,课程管理,POST /api/courses-正常创建-应返回201,已登录,步骤1:调用POST /api/courses,"name=Python基础,category=编程,hours=40,price=2000","预期1:状态码201,包含course_id,数据库存在记录",P0,自动化
+TC-API-CRS-002,接口,课程管理,POST /api/courses-名称为空-应返回400,已登录,步骤1:调用POST /api/courses,"name=,hours=40,price=2000","预期1:状态码400,msg包含名称不能为空",P0,自动化
+TC-API-CRS-003,接口,课程管理,POST /api/courses-课时为0-应返回400,已登录,步骤1:调用POST /api/courses,"name=Python,hours=0,price=2000","预期1:状态码400,msg包含课时必须大于0",P0,自动化
+TC-API-CRS-004,接口,课程管理,POST /api/courses-单价为0-应返回400,已登录,步骤1:调用POST /api/courses,"name=Python,hours=40,price=0","预期1:状态码400,msg包含单价必须大于0",P0,自动化
+TC-API-CRS-005,接口,课程管理,GET /api/courses-分页查询-应返回200,已登录,步骤1:调用GET /api/courses,"page=1,per_page=10","预期1:状态码200,包含total/page/items",P0,自动化
+TC-API-CRS-006,接口,课程管理,GET /api/courses-按类别筛选-应返回200,已登录,步骤1:调用GET /api/courses,category=编程,"预期1:状态码200,返回课程类别均为编程",P0,自动化
+TC-API-CRS-007,接口,课程管理,GET /api/courses/:id-正常查询-应返回200,已登录且课程存在,步骤1:调用GET /api/courses/1,无,"预期1:状态码200,返回课程完整信息",P0,自动化
+TC-API-CRS-008,接口,课程管理,GET /api/courses/:id-不存在-应返回404,已登录,步骤1:调用GET /api/courses/99999,无,"预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-API-CRS-009,接口,课程管理,PUT /api/courses/:id-正常更新-应返回200,已登录且课程存在,步骤1:调用PUT /api/courses/1,"name=Python进阶,price=3000","预期1:状态码200,数据库已更新",P0,自动化
+TC-API-CRS-010,接口,课程管理,DELETE /api/courses/:id-正常删除-应返回200,已登录且课程无报名,步骤1:调用DELETE /api/courses/1,无,"预期1:状态码200,数据库已删除",P0,自动化
+TC-API-CRS-011,接口,课程管理,DELETE /api/courses/:id-有报名记录-应返回409,已登录且课程有报名,步骤1:调用DELETE /api/courses/1,无,"预期1:状态码409,msg包含存在报名记录",P0,自动化
+TC-API-CRS-012,接口,课程管理,POST /api/courses-课时负数-应拒绝,已登录,步骤1:调用POST /api/courses,"name=Python,hours=-10,price=2000","预期1:状态码400,msg包含课时必须大于0",P0,自动化
+TC-API-CRS-013,接口,课程管理,POST /api/courses-单价负数-应拒绝,已登录,步骤1:调用POST /api/courses,"name=Python,hours=40,price=-100","预期1:状态码400,msg包含单价必须大于0",P0,自动化
+TC-API-CRS-014,接口,课程管理,GET /api/courses-按名称搜索-应返回200,已登录,步骤1:调用GET /api/courses,keyword=Python,"预期1:状态码200,返回名称包含Python的课程",P0,自动化
+TC-API-CRS-015,接口,课程管理,GET /api/courses-组合筛选-应返回200,已登录,步骤1:调用GET /api/courses,"category=编程,keyword=Python","预期1:状态码200,返回编程类且名称包含Python的课程",P0,自动化
+TC-API-CRS-016,接口,课程管理,PUT /api/courses/:id-课程不存在-应返回404,已登录,步骤1:调用PUT /api/courses/99999,name=新名称,"预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-API-CRS-017,接口,课程管理,POST /api/courses/:id/schedule-教室冲突-应拒绝,已登录且时间段已被占用,步骤1:调用POST /api/courses/1/schedule,"teacher_id=1,room_id=1,time=2026-03-17 09:00","预期1:状态码409,msg包含教室冲突",P0,自动化
+TC-API-CRS-018,接口,课程管理,POST /api/courses/:id/schedule-教师冲突-应拒绝,已登录且教师时间冲突,步骤1:调用POST /api/courses/1/schedule,"teacher_id=1,room_id=2,time=2026-03-17 09:00","预期1:状态码409,msg包含教师冲突",P0,自动化
+TC-API-CRS-019,接口,课程管理,GET /api/courses/:id/students-查询已报名学员-应返回200,已登录且课程有报名,步骤1:调用GET /api/courses/1/students,无,"预期1:状态码200,返回已报名学员列表",P0,自动化
+TC-API-CRS-020,接口,课程管理,GET /api/courses/count-统计课程数-应返回200,已登录,步骤1:调用GET /api/courses/count,无,"预期1:状态码200,返回课程总数",P0,自动化
+TC-API-ENR-001,接口,报名缴费,POST /api/enrollments-正常报名-应返回201,已登录且存在学员和课程,步骤1:调用POST /api/enrollments,"student_id=1,course_id=1","预期1:状态码201,包含enrollment_id,数据库存在记录",P0,自动化
+TC-API-ENR-002,接口,报名缴费,POST /api/enrollments-学员不存在-应返回404,已登录,步骤1:调用POST /api/enrollments,"student_id=99999,course_id=1","预期1:状态码404,msg包含学员不存在",P0,自动化
+TC-API-ENR-003,接口,报名缴费,POST /api/enrollments-课程不存在-应返回404,已登录,步骤1:调用POST /api/enrollments,"student_id=1,course_id=99999","预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-API-ENR-004,接口,报名缴费,POST /api/enrollments-重复报名-应返回409,已登录且已报名,步骤1:调用POST /api/enrollments,"student_id=1,course_id=1","预期1:状态码409,msg包含已报名",P0,自动化
+TC-API-ENR-005,接口,报名缴费,GET /api/enrollments-分页查询-应返回200,已登录,步骤1:调用GET /api/enrollments,"page=1,per_page=10","预期1:状态码200,包含total/page/items",P0,自动化
+TC-API-ENR-006,接口,报名缴费,DELETE /api/enrollments/:id-正常删除-应返回200,已登录且报名存在,步骤1:调用DELETE /api/enrollments/1,无,"预期1:状态码200,数据库已删除,缴费记录级联删除",P0,自动化
+TC-API-PAY-001,接口,报名缴费,POST /api/payments-正常缴费-应返回201,已登录且报名存在,步骤1:调用POST /api/payments,"enrollment_id=1,amount=2000,payment_method=现金","预期1:状态码201,包含payment_id,数据库存在记录",P0,自动化
+TC-API-PAY-002,接口,报名缴费,POST /api/payments-金额为0-应返回400,已登录,步骤1:调用POST /api/payments,"enrollment_id=1,amount=0","预期1:状态码400,msg包含金额必须大于0",P0,自动化
+TC-API-PAY-003,接口,报名缴费,POST /api/payments-金额负数-应返回400,已登录,步骤1:调用POST /api/payments,"enrollment_id=1,amount=-100","预期1:状态码400,msg包含金额必须大于0",P0,自动化
+TC-API-PAY-004,接口,报名缴费,GET /api/enrollments/arrears-查询欠费-应返回200,已登录,步骤1:调用GET /api/enrollments/arrears,无,"预期1:状态码200,返回欠费学员列表,欠费金额计算正确",P0,自动化
+TC-API-ENR-007,接口,报名缴费,GET /api/enrollments-按学员筛选-应返回200,已登录,步骤1:调用GET /api/enrollments,student_id=1,"预期1:状态码200,返回该学员所有报名",P0,自动化
+TC-API-ENR-008,接口,报名缴费,GET /api/enrollments-按课程筛选-应返回200,已登录,步骤1:调用GET /api/enrollments,course_id=1,"预期1:状态码200,返回该课程所有报名",P0,自动化
+TC-API-ENR-009,接口,报名缴费,GET /api/enrollments/:id-查询详情-应返回200,已登录且报名存在,步骤1:调用GET /api/enrollments/1,无,"预期1:状态码200,返回报名完整信息",P0,自动化
+TC-API-ENR-010,接口,报名缴费,DELETE /api/enrollments/:id-不存在-应返回404,已登录,步骤1:调用DELETE /api/enrollments/99999,无,"预期1:状态码404,msg包含报名不存在",P0,自动化
+TC-API-PAY-005,接口,报名缴费,POST /api/payments-报名不存在-应返回404,已登录,步骤1:调用POST /api/payments,"enrollment_id=99999,amount=1000","预期1:状态码404,msg包含报名不存在",P0,自动化
+TC-API-PAY-006,接口,报名缴费,POST /api/payments-超额缴费-应成功,已登录,步骤1:调用POST /api/payments,"enrollment_id=1,amount=5000(课程单价2000)","预期1:状态码201,记录超额金额",P0,自动化
+TC-API-PAY-007,接口,报名缴费,POST /api/payments-部分缴费-应成功,已登录,步骤1:调用POST /api/payments,"enrollment_id=1,amount=1000","预期1:状态码201,欠费金额=1000",P0,自动化
+TC-API-PAY-008,接口,报名缴费,GET /api/payments-按报名查询-应返回200,已登录,步骤1:调用GET /api/payments,enrollment_id=1,"预期1:状态码200,返回该报名所有缴费记录",P0,自动化
+TC-API-PAY-009,接口,报名缴费,GET /api/payments/:id-查询详情-应返回200,已登录且缴费存在,步骤1:调用GET /api/payments/1,无,"预期1:状态码200,返回缴费详情",P0,自动化
+TC-API-PAY-010,接口,报名缴费,POST /api/payments/:id/receipt-生成收据-应返回200,已登录且缴费存在,步骤1:调用POST /api/payments/1/receipt,无,"预期1:状态码200,返回收据信息",P0,自动化
+TC-API-PAY-011,接口,报名缴费,GET /api/payments/:id/receipt-查询收据-应返回200,已登录且收据存在,步骤1:调用GET /api/payments/1/receipt,无,"预期1:状态码200,返回收据完整信息",P0,自动化
+TC-API-ENR-011,接口,报名缴费,GET /api/enrollments/statistics-报名统计-应返回200,已登录,步骤1:调用GET /api/enrollments/statistics,无,"预期1:状态码200,返回报名统计数据",P0,自动化
+TC-API-ATT-001,接口,考勤管理,POST /api/attendances-正常考勤-应返回201,已登录且报名存在,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-03-17,status=出勤","预期1:状态码201,数据库存在记录",P0,自动化
+TC-API-ATT-002,接口,考勤管理,POST /api/attendances-学员未报名-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=99,date=2026-03-17","预期1:状态码400,msg包含学员未报名该课程",P0,自动化
+TC-API-ATT-003,接口,考勤管理,POST /api/attendances-日期格式错误-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-13-32","预期1:状态码400,msg包含日期格式错误",P0,自动化
+TC-API-ATT-004,接口,考勤管理,POST /api/attendances-未来日期-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2027-01-01","预期1:状态码400,msg包含不能记录未来考勤",P0,自动化
+TC-API-ATT-005,接口,考勤管理,GET /api/attendances-分页查询-应返回200,已登录,步骤1:调用GET /api/attendances,"page=1,per_page=10","预期1:状态码200,包含total/page/items",P0,自动化
+TC-API-ATT-006,接口,考勤管理,GET /api/attendances/rate-查询出勤率-应返回200,已登录,步骤1:调用GET /api/attendances/rate,student_id=1,"预期1:状态码200,返回出勤率,计算正确",P0,自动化
+TC-API-ATT-001,接口,考勤管理,POST /api/attendances-正常考勤-应返回201,已登录且报名存在,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-03-17,status=出勤","预期1:状态码201,数据库存在记录",P0,自动化
+TC-API-ATT-002,接口,考勤管理,POST /api/attendances-学员未报名-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=99,date=2026-03-17","预期1:状态码400,msg包含学员未报名该课程",P0,自动化
+TC-API-ATT-003,接口,考勤管理,POST /api/attendances-日期格式错误-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-13-32","预期1:状态码400,msg包含日期格式错误",P0,自动化
+TC-API-ATT-004,接口,考勤管理,POST /api/attendances-未来日期-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2027-01-01","预期1:状态码400,msg包含不能记录未来考勤",P0,自动化
+TC-API-ATT-005,接口,考勤管理,GET /api/attendances-分页查询-应返回200,已登录,步骤1:调用GET /api/attendances,"page=1,per_page=10","预期1:状态码200,包含total/page/items",P0,自动化
+TC-API-ATT-006,接口,考勤管理,GET /api/attendances/rate-查询出勤率-应返回200,已登录,步骤1:调用GET /api/attendances/rate,student_id=1,"预期1:状态码200,返回出勤率,计算正确",P0,自动化
+TC-API-ATT-007,接口,考勤管理,POST /api/attendances-批量考勤-应返回201,已登录,步骤1:调用POST /api/attendances/batch,"[{student_id:1,course_id:1,date:2026-03-17,status:出勤},{...}]","预期1:状态码201,批量创建成功",P0,自动化
+TC-API-ATT-008,接口,考勤管理,POST /api/attendances-重复考勤-应拒绝,已登录且已考勤,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-03-17","预期1:状态码409,msg包含已存在考勤记录",P0,自动化
+TC-API-ATT-009,接口,考勤管理,PUT /api/attendances/:id-修改考勤-应返回200,已登录且考勤存在,步骤1:调用PUT /api/attendances/1,status=请假,"预期1:状态码200,数据库已更新",P0,自动化
+TC-API-ATT-010,接口,考勤管理,GET /api/attendances-按日期筛选-应返回200,已登录,步骤1:调用GET /api/attendances,date=2026-03-17,"预期1:状态码200,返回该日期所有考勤",P0,自动化
+TC-API-ATT-011,接口,考勤管理,GET /api/attendances-按状态筛选-应返回200,已登录,步骤1:调用GET /api/attendances,status=出勤,"预期1:状态码200,返回出勤记录",P0,自动化
+TC-API-ATT-012,接口,考勤管理,POST /api/leaves-提交请假-应返回201,已登录,步骤1:调用POST /api/leaves,"student_id=1,course_id=1,date=2026-03-18,reason=生病","预期1:状态码201,请假记录创建",P1,自动化
+TC-API-ATT-013,接口,考勤管理,PATCH /api/leaves/:id/approve-审批通过-应返回200,已登录管理员,步骤1:调用PATCH /api/leaves/1/approve,status=通过,"预期1:状态码200,审批状态更新",P1,自动化
+TC-API-ATT-014,接口,考勤管理,GET /api/leaves-查询请假列表-应返回200,已登录,步骤1:调用GET /api/leaves,无,"预期1:状态码200,返回请假列表",P1,自动化
+TC-API-STAT-001,接口,统计分析,GET /api/statistics/dashboard-仪表盘数据-应返回200,已登录,步骤1:调用GET /api/statistics/dashboard,无,"预期1:状态码200,返回学员总数/课程总数/报名总数/收入总额",P0,自动化
+TC-API-STAT-002,接口,统计分析,GET /api/statistics/students-学员统计-应返回200,已登录,步骤1:调用GET /api/statistics/students,group_by=status,"预期1:状态码200,返回各状态学员数",P0,自动化
+TC-API-STAT-003,接口,统计分析,GET /api/statistics/revenue-收入统计-应返回200,已登录,步骤1:调用GET /api/statistics/revenue,"start_date=2026-03-01,end_date=2026-03-31","预期1:状态码200,返回月度收入数据",P0,自动化
+TC-API-STAT-004,接口,统计分析,GET /api/statistics/attendance-出勤率统计-应返回200,已登录,步骤1:调用GET /api/statistics/attendance,course_id=1,"预期1:状态码200,返回课程出勤率",P0,自动化
+TC-API-STAT-005,接口,统计分析,GET /api/statistics/charts-图表数据-应返回200,已登录,步骤1:调用GET /api/statistics/charts,type=revenue_trend,"预期1:状态码200,返回收入趋势图数据",P1,自动化
+TC-API-STAT-006,接口,统计分析,GET /api/statistics/enrollments-报名统计-应返回200,已登录,步骤1:调用GET /api/statistics/enrollments,group_by=course,"预期1:状态码200,返回各课程报名数",P0,自动化
+TC-BOUND-001,边界,学员管理,学员年龄-最小值-应接受,已登录,步骤1:调用POST /api/students,"name=张三,age=1","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-002,边界,学员管理,学员年龄-0值-应拒绝,已登录,步骤1:调用POST /api/students,"name=张三,age=0","预期1:状态码400,msg包含年龄必须大于0",P0,自动化
+TC-BOUND-003,边界,学员管理,学员年龄-负数-应拒绝,已登录,步骤1:调用POST /api/students,"name=张三,age=-1","预期1:状态码400,msg包含年龄必须大于0",P0,自动化
+TC-BOUND-004,边界,学员管理,学员年龄-超大值-应拒绝,已登录,步骤1:调用POST /api/students,"name=张三,age=200","预期1:状态码400,msg包含年龄超出范围",P0,自动化
+TC-BOUND-005,边界,课程管理,课程课时-最小值-应接受,已登录,步骤1:调用POST /api/courses,"name=Python,hours=1,price=100","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-006,边界,课程管理,课程课时-0值-应拒绝,已登录,步骤1:调用POST /api/courses,"name=Python,hours=0,price=100","预期1:状态码400,msg包含课时必须大于0",P0,自动化
+TC-BOUND-007,边界,课程管理,课程单价-0值-应拒绝,已登录,步骤1:调用POST /api/courses,"name=Python,hours=10,price=0","预期1:状态码400,msg包含单价必须大于0",P0,自动化
+TC-BOUND-008,边界,报名缴费,缴费金额-0值-应拒绝,已登录,步骤1:调用POST /api/payments,"enrollment_id=1,amount=0","预期1:状态码400,msg包含金额必须大于0",P0,自动化
+TC-BOUND-009,边界,报名缴费,缴费金额-负数-应拒绝,已登录,步骤1:调用POST /api/payments,"enrollment_id=1,amount=-100","预期1:状态码400,msg包含金额必须大于0",P0,自动化
+TC-BOUND-010,边界,学员管理,分页参数-page=0-应返回第1页,已登录,步骤1:调用GET /api/students,"page=0,per_page=10","预期1:状态码200,返回第1页数据",P0,自动化
+TC-BOUND-011,边界,学员管理,分页参数-page负数-应拒绝,已登录,步骤1:调用GET /api/students,"page=-1,per_page=10","预期1:状态码400,msg包含页码无效",P0,自动化
+TC-BOUND-012,边界,学员管理,分页参数-per_page超大-应限制,已登录,步骤1:调用GET /api/students,"page=1,per_page=10000","预期1:状态码200,最多返回1000条",P0,自动化
+TC-E2E-001,E2E,核心流程,新学员报名缴费完整流程,已登录,步骤1:创建学员|步骤2:创建课程|步骤3:报名登记|步骤4:缴费记录|步骤5:生成收据,"学员:张三/男/20/13800138000,课程:Python/40课时/2000元,缴费:2000元/现金","预期1:学员创建成功|预期2:课程创建成功|预期3:报名成功|预期4:缴费成功|预期5:收据生成,数据一致",P0,自动化
+TC-E2E-002,E2E,核心流程,学员考勤统计流程,已登录且存在报名,步骤1:记录考勤|步骤2:计算出勤率|步骤3:查看统计,"考勤10次,出勤8次,请假1次,缺勤1次",预期1:考勤记录成功|预期2:出勤率80%|预期3:统计数据正确,P0,自动化
+TC-E2E-003,E2E,核心流程,批量导入学员并报名,已登录且存在课程,步骤1:批量导入学员|步骤2:选择课程|步骤3:批量报名,"Excel包含10个学员,课程ID=1",预期1:导入成功10个|预期2:课程选择成功|预期3:批量报名成功10个,P0,自动化
+TC-E2E-004,E2E,核心流程,欠费学员催缴流程,已登录且存在欠费,步骤1:查询欠费列表|步骤2:选择学员|步骤3:缴费|步骤4:验证欠费更新,"学员欠费1000元,本次缴费500元",预期1:欠费列表显示正确|预期2:学员选中|预期3:缴费成功|预期4:欠费更新为500元,P0,自动化
+TC-E2E-005,E2E,核心流程,学员状态变更流程,已登录且学员状态为在读,步骤1:变更为休学|步骤2:变更为在读|步骤3:变更为结业,学员ID=1,预期1:状态变为休学|预期2:状态变为在读|预期3:状态变为结业,P0,自动化
+TC-E2E-011,E2E,异常处理,报名失败回滚流程,已登录,步骤1:报名登记|步骤2:模拟缴费失败|步骤3:验证数据回滚,"student_id=1,course_id=1,缴费失败","预期1:报名创建|预期2:缴费失败|预期3:报名记录已删除,数据库无脏数据",P0,自动化
+TC-E2E-012,E2E,异常处理,重复报名拦截流程,已登录且已报名,步骤1:再次报名|步骤2:验证拦截,"student_id=1,course_id=1",预期1:返回409|预期2:提示已报名,P0,自动化
+TC-E2E-013,E2E,异常处理,删除学员级联检查,已登录且学员有报名,步骤1:删除学员|步骤2:验证拦截,student_id=1,"预期1:返回409|预期2:提示存在报名记录,学员未删除",P0,自动化
+TC-E2E-019,E2E,跨模块集成,学员全生命周期管理,已登录,步骤1:录入学员|步骤2:报名课程|步骤3:缴费|步骤4:考勤|步骤5:结业,完整学员数据,预期1:学员创建|预期2:报名成功|预期3:缴费完成|预期4:考勤记录|预期5:状态变为结业,P0,自动化
+TC-E2E-020,E2E,跨模块集成,课程从创建到结课,已登录,步骤1:创建课程|步骤2:学员报名|步骤3:考勤记录|步骤4:统计分析,课程:Python基础,预期1:课程创建|预期2:报名成功|预期3:考勤完成|预期4:统计数据正确,P0,自动化
+TC-E2E-001,E2E,核心流程,新学员报名缴费完整流程,已登录,步骤1:创建学员|步骤2:创建课程|步骤3:报名登记|步骤4:缴费记录|步骤5:生成收据,"学员:张三/男/20/13800138000,课程:Python/40课时/2000元,缴费:2000元/现金","预期1:学员创建成功|预期2:课程创建成功|预期3:报名成功|预期4:缴费成功|预期5:收据生成,数据一致",P0,自动化
+TC-E2E-002,E2E,核心流程,学员考勤统计流程,已登录且存在报名,步骤1:记录考勤|步骤2:计算出勤率|步骤3:查看统计,"考勤10次,出勤8次,请假1次,缺勤1次",预期1:考勤记录成功|预期2:出勤率80%|预期3:统计数据正确,P0,自动化
+TC-E2E-003,E2E,核心流程,批量导入学员并报名,已登录且存在课程,步骤1:批量导入学员|步骤2:选择课程|步骤3:批量报名,"Excel包含10个学员,课程ID=1",预期1:导入成功10个|预期2:课程选择成功|预期3:批量报名成功10个,P0,自动化
+TC-E2E-004,E2E,核心流程,欠费学员催缴流程,已登录且存在欠费,步骤1:查询欠费列表|步骤2:选择学员|步骤3:缴费|步骤4:验证欠费更新,"学员欠费1000元,本次缴费500元",预期1:欠费列表显示正确|预期2:学员选中|预期3:缴费成功|预期4:欠费更新为500元,P0,自动化
+TC-E2E-005,E2E,核心流程,学员状态变更流程,已登录且学员状态为在读,步骤1:变更为休学|步骤2:变更为在读|步骤3:变更为结业,学员ID=1,预期1:状态变为休学|预期2:状态变为在读|预期3:状态变为结业,P0,自动化
+TC-E2E-006,E2E,核心流程,课程安排冲突处理,已登录,步骤1:创建课程|步骤2:安排时间|步骤3:检测冲突|步骤4:调整时间|步骤5:保存,"教室1,时间09:00-11:00",预期1:课程创建|预期2:时间安排|预期3:检测到冲突|预期4:时间调整|预期5:保存成功,P1,自动化
+TC-E2E-007,E2E,核心流程,收入统计报表生成,已登录且存在缴费,步骤1:查询缴费记录|步骤2:按月统计|步骤3:生成趋势图|步骤4:导出Excel,2026年3月缴费数据,预期1:缴费记录查询成功|预期2:月度统计正确|预期3:趋势图显示|预期4:Excel导出成功,P1,自动化
+TC-E2E-008,E2E,核心流程,学员档案完整查看,已登录且学员存在,步骤1:查看基本信息|步骤2:查看课程信息|步骤3:查看缴费记录|步骤4:查看考勤记录,学员ID=1,预期1:基本信息显示|预期2:课程信息显示|预期3:缴费记录显示|预期4:考勤记录显示,P0,自动化
+TC-E2E-009,E2E,核心流程,用户登录到业务操作,无,步骤1:登录|步骤2:权限验证|步骤3:创建学员|步骤4:查看日志,admin/admin123,预期1:登录成功|预期2:权限验证通过|预期3:学员创建成功|预期4:日志已记录,P0,自动化
+TC-E2E-010,E2E,核心流程,分期缴费完整流程,已登录且存在报名,步骤1:首次缴费|步骤2:查询欠费|步骤3:二次缴费|步骤4:验证缴清,"课程2000元,首次1000,二次1000",预期1:首次缴费成功|预期2:欠费1000|预期3:二次缴费成功|预期4:欠费为0,P0,自动化
+TC-E2E-011,E2E,异常处理,报名失败回滚流程,已登录,步骤1:报名登记|步骤2:模拟缴费失败|步骤3:验证数据回滚,"student_id=1,course_id=1,缴费失败","预期1:报名创建|预期2:缴费失败|预期3:报名记录已删除,数据库无脏数据",P0,自动化
+TC-E2E-012,E2E,异常处理,重复报名拦截流程,已登录且已报名,步骤1:再次报名|步骤2:验证拦截,"student_id=1,course_id=1",预期1:返回409|预期2:提示已报名,P0,自动化
+TC-E2E-013,E2E,异常处理,删除学员级联检查,已登录且学员有报名,步骤1:删除学员|步骤2:验证拦截,student_id=1,"预期1:返回409|预期2:提示存在报名记录,学员未删除",P0,自动化
+TC-E2E-014,E2E,异常处理,删除课程级联检查,已登录且课程有报名,步骤1:删除课程|步骤2:验证拦截,course_id=1,"预期1:返回409|预期2:提示存在报名记录,课程未删除",P0,自动化
+TC-E2E-015,E2E,异常处理,并发报名冲突处理,已登录,步骤1:5个用户同时报名|步骤2:验证结果|步骤3:检查数据一致性,"课程名额10个,5人同时报名",预期1:5个报名成功|预期2:无重复报名|预期3:数据一致,P1,自动化
+TC-E2E-016,E2E,异常处理,批量导入部分失败,已登录,步骤1:批量导入|步骤2:验证结果|步骤3:查看错误详情,"100条数据,20条格式错误","预期1:导入完成|预期2:成功80条,失败20条|预期3:错误详情清晰",P1,自动化
+TC-E2E-017,E2E,异常处理,Token过期重新登录,已登录,步骤1:操作中Token过期|步骤2:返回401|步骤3:重新登录|步骤4:继续操作,模拟Token过期,预期1:操作失败|预期2:返回401|预期3:登录成功|预期4:操作成功,P1,自动化
+TC-E2E-018,E2E,异常处理,网络中断恢复,已登录,步骤1:创建学员|步骤2:模拟网络中断|步骤3:网络恢复|步骤4:重试操作,学员数据,预期1:创建失败|预期2:提示网络错误|预期3:网络恢复|预期4:重试成功,P1,自动化
+TC-E2E-019,E2E,跨模块集成,学员全生命周期管理,已登录,步骤1:录入学员|步骤2:报名课程|步骤3:缴费|步骤4:考勤|步骤5:结业,完整学员数据,预期1:学员创建|预期2:报名成功|预期3:缴费完成|预期4:考勤记录|预期5:状态变为结业,P0,自动化
+TC-E2E-020,E2E,跨模块集成,课程从创建到结课,已登录,步骤1:创建课程|步骤2:学员报名|步骤3:考勤记录|步骤4:统计分析,课程:Python基础,预期1:课程创建|预期2:报名成功|预期3:考勤完成|预期4:统计数据正确,P0,自动化
+TC-E2E-021,E2E,跨模块集成,财务对账完整流程,已登录,步骤1:报名登记|步骤2:分期缴费|步骤3:欠费提醒|步骤4:补缴|步骤5:生成收据|步骤6:收入统计,"课程2000元,分3期",预期1:报名成功|预期2:首期缴费|预期3:欠费提醒|预期4:补缴完成|预期5:收据生成|预期6:统计正确,P0,自动化
+TC-E2E-022,E2E,跨模块集成,多课程报名管理,已登录,步骤1:学员报名3门课程|步骤2:分别缴费|步骤3:分别考勤|步骤4:综合统计,3门课程,预期1:3个报名成功|预期2:3笔缴费成功|预期3:考勤记录完整|预期4:统计数据正确,P1,自动化
+TC-E2E-023,E2E,跨模块集成,批量操作完整链路,已登录,步骤1:批量导入学员|步骤2:批量报名|步骤3:批量考勤|步骤4:批量导出,50个学员,预期1:导入成功50个|预期2:报名成功50个|预期3:考勤记录50条|预期4:导出50条,P1,自动化
+TC-E2E-024,E2E,跨模块集成,数据统计全流程,已登录,步骤1:业务操作|步骤2:数据积累|步骤3:统计计算|步骤4:图表展示|步骤5:报表导出,完整业务数据,预期1:操作成功|预期2:数据保存|预期3:统计正确|预期4:图表显示|预期5:报表导出,P1,自动化
+TC-E2E-025,E2E,权限安全,角色权限完整验证,无,步骤1:管理员登录|步骤2:访问所有功能|步骤3:财务登录|步骤4:访问财务功能|步骤5:访问学员管理,admin和财务账号,预期1:管理员登录成功|预期2:所有功能可访问|预期3:财务登录成功|预期4:财务功能可访问|预期5:返回403,P0,自动化
+TC-E2E-026,E2E,权限安全,越权操作拦截,已登录财务角色,步骤1:访问学员管理|步骤2:验证拦截|步骤3:查看日志,财务角色,预期1:返回403|预期2:提示无权限|预期3:日志已记录,P0,自动化
+TC-E2E-027,E2E,权限安全,操作日志完整记录,已登录,步骤1:创建学员|步骤2:更新学员|步骤3:删除学员|步骤4:查看日志,学员数据,预期1:创建成功|预期2:更新成功|预期3:删除成功|预期4:日志完整记录3条操作,P1,自动化
+TC-E2E-028,E2E,数据一致性,并发缴费数据一致,已登录,步骤1:同一报名5个用户同时缴费|步骤2:验证总金额|步骤3:验证欠费计算,每次缴费500元,预期1:5笔缴费成功|预期2:总金额2500元|预期3:欠费计算正确,P0,自动化
+TC-E2E-029,E2E,数据一致性,级联删除数据一致,已登录,步骤1:创建报名和缴费|步骤2:删除报名|步骤3:验证缴费记录删除,"报名ID=1,缴费3笔",预期1:报名和缴费创建|预期2:报名删除成功|预期3:3笔缴费记录已删除,P0,自动化
+TC-E2E-030,E2E,数据一致性,统计数据一致性,已登录,步骤1:创建10个学员|步骤2:5个报名|步骤3:查看统计|步骤4:验证数据,完整数据,"预期1:10个学员创建|预期2:5个报名成功|预期3:统计显示|预期4:学员数=10,报名数=5",P0,自动化
+TC-EXCEP-001,异常,学员管理,创建学员-姓名为空-应拒绝,已登录,步骤1:调用POST /api/students,"name=,gender=男","预期1:状态码400,msg包含姓名不能为空",P0,自动化
+TC-EXCEP-002,异常,学员管理,创建学员-仅空格-应拒绝,已登录,步骤1:调用POST /api/students,"name=   ,gender=男","预期1:状态码400,msg包含姓名不能为空",P0,自动化
+TC-EXCEP-003,异常,学员管理,创建学员-特殊字符-应转义,已登录,步骤1:调用POST /api/students,name=<script>alert(1)</script>,"预期1:状态码201,姓名已转义保存",P0,自动化
+TC-EXCEP-004,异常,学员管理,搜索学员-SQL注入-应防护,已登录,步骤1:调用GET /api/students,keyword=' OR 1=1--,"预期1:状态码200,不影响查询,无SQL注入",P0,自动化
+TC-EXCEP-005,异常,学员管理,删除不存在学员-应返回404,已登录,步骤1:调用DELETE /api/students/99999,无,"预期1:状态码404,msg包含学员不存在",P0,自动化
+TC-EXCEP-006,异常,课程管理,删除不存在课程-应返回404,已登录,步骤1:调用DELETE /api/courses/99999,无,"预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-EXCEP-007,异常,报名缴费,报名不存在学员-应返回404,已登录,步骤1:调用POST /api/enrollments,"student_id=99999,course_id=1","预期1:状态码404,msg包含学员不存在",P0,自动化
+TC-EXCEP-008,异常,考勤管理,未来日期考勤-应拒绝,已登录,步骤1:调用POST /api/attendances,"date=2027-01-01,student_id=1","预期1:状态码400,msg包含不能记录未来考勤",P0,自动化
+TC-EXCEP-009,异常,考勤管理,日期格式错误-应拒绝,已登录,步骤1:调用POST /api/attendances,"date=2026-13-32,student_id=1","预期1:状态码400,msg包含日期格式错误",P0,自动化
+TC-EXCEP-010,异常,报名缴费,重复报名-应拒绝,已登录且已报名,步骤1:调用POST /api/enrollments,"student_id=1,course_id=1","预期1:状态码409,msg包含已报名",P0,自动化
+TC-PERF-001,性能,学员管理,学员列表分页查询-响应时间,已登录且存在1000条数据,步骤1:调用GET /api/students,"page=1,per_page=10",预期1:响应时间≤500ms,P1,自动化
+TC-PERF-002,性能,学员管理,批量导入学员-吞吐量,已登录,步骤1:批量导入100条学员,Excel包含100条数据,"预期1:导入成功,耗时≤10秒,成功率≥99%",P1,自动化
+TC-PERF-003,性能,学员管理,批量导出学员-响应时间,已登录且存在1000条数据,步骤1:调用GET /api/students/export,导出1000条,预期1:响应时间≤3秒,P1,自动化
+TC-PERF-004,性能,报名缴费,并发报名-并发性能,已登录,步骤1:50并发调用POST /api/enrollments,50个并发请求,"预期1:响应时间≤1秒,成功率100%",P1,自动化
+TC-PERF-005,性能,统计分析,仪表盘数据加载-首屏时间,已登录,步骤1:访问仪表盘页面,无,预期1:首屏加载≤3秒,P1,自动化
+TC-PERF-006,性能,认证授权,并发登录-并发性能,无,步骤1:50并发调用POST /api/login,50个并发请求,"预期1:成功率100%,响应时间≤1秒",P1,自动化
+TC-SEC-001,安全,认证授权,未登录访问拦截,无token,步骤1:调用GET /api/students,不携带token,"预期1:状态码401,msg包含未登录",P0,自动化
+TC-SEC-002,安全,认证授权,Token过期验证,token已过期,步骤1:调用GET /api/students,携带过期token,"预期1:状态码401,msg包含token过期",P0,自动化
+TC-SEC-003,安全,认证授权,无效Token验证,无,步骤1:调用GET /api/students,携带伪造token,"预期1:状态码401,msg包含token无效",P0,自动化
+TC-SEC-004,安全,学员管理,SQL注入防护,已登录,步骤1:调用GET /api/students,keyword=' OR 1=1--,"预期1:状态码200,无SQL注入,数据正常",P0,自动化
+TC-SEC-005,安全,学员管理,XSS攻击防护,已登录,步骤1:调用POST /api/students,name=<script>alert(1)</script>,"预期1:状态码201,脚本已转义",P0,自动化
+TC-SEC-006,安全,认证授权,密码加密存储,数据库,步骤1:查询users表password字段,无,"预期1:密码字段已加密,非明文",P0,手工
+TC-SEC-007,安全,认证授权,操作日志记录,已登录,步骤1:执行CRUD操作|步骤2:查询日志表,创建/更新/删除操作,"预期1:操作完成|预期2:日志已记录,包含用户/时间/操作",P1,自动化
+TC-SEC-008,安全,报名缴费,批量操作限流,已登录,步骤1:连续调用批量导入10次,每次100条数据,"预期1:前5次成功,后5次返回429限流",P1,自动化
+TC-SEC-001,安全,认证授权,未登录访问拦截,无token,步骤1:调用GET /api/students,不携带token,"预期1:状态码401,msg包含未登录",P0,自动化
+TC-SEC-002,安全,认证授权,Token过期验证,token已过期,步骤1:调用GET /api/students,携带过期token,"预期1:状态码401,msg包含token过期",P0,自动化
+TC-SEC-003,安全,认证授权,无效Token验证,无,步骤1:调用GET /api/students,携带伪造token,"预期1:状态码401,msg包含token无效",P0,自动化
+TC-SEC-004,安全,学员管理,SQL注入防护-查询,已登录,步骤1:调用GET /api/students,keyword=' OR 1=1--,"预期1:状态码200,无SQL注入,数据正常",P0,自动化
+TC-SEC-005,安全,学员管理,XSS攻击防护-创建,已登录,步骤1:调用POST /api/students,name=<script>alert(1)</script>,"预期1:状态码201,脚本已转义",P0,自动化
+TC-SEC-006,安全,认证授权,密码加密存储,数据库,步骤1:查询users表password字段,无,"预期1:密码字段已加密,非明文",P0,手工
+TC-SEC-007,安全,认证授权,操作日志记录,已登录,步骤1:执行CRUD操作|步骤2:查询日志表,创建/更新/删除操作,"预期1:操作完成|预期2:日志已记录,包含用户/时间/操作",P1,自动化
+TC-SEC-008,安全,报名缴费,批量操作限流,已登录,步骤1:连续调用批量导入10次,每次100条数据,"预期1:前5次成功,后5次返回429限流",P1,自动化
+TC-SEC-009,安全,学员管理,SQL注入防护-更新,已登录,步骤1:调用PUT /api/students/1,name=' OR '1'='1,"预期1:状态码200,无SQL注入,仅更新name字段",P0,自动化
+TC-SEC-010,安全,课程管理,SQL注入防护-删除,已登录,步骤1:调用DELETE /api/courses/1 OR 1=1,无,"预期1:状态码404或400,无SQL注入,不删除其他记录",P0,自动化
+TC-SEC-011,安全,学员管理,XSS攻击防护-更新,已登录,步骤1:调用PUT /api/students/1,name=<img src=x onerror=alert(1)>,"预期1:状态码200,标签已转义",P0,自动化
+TC-SEC-012,安全,报名缴费,XSS攻击防护-查询,已登录,步骤1:调用GET /api/enrollments,keyword=<script>,"预期1:状态码200,脚本已转义,无XSS",P0,自动化
+TC-SEC-013,安全,认证授权,暴力破解防护,无,步骤1:连续10次错误密码登录,username=admin,错误密码,"预期1:前5次返回401,后5次返回429或账号锁定",P0,自动化
+TC-SEC-014,安全,认证授权,Session劫持防护,已登录,步骤1:获取token|步骤2:另一IP使用token|步骤3:验证拦截,token,预期1:token获取|预期2:使用token|预期3:返回401或记录异常,P1,自动化
+TC-SEC-015,安全,学员管理,CSRF防护,已登录,步骤1:不携带CSRF token调用POST,创建学员数据,"预期1:返回403,提示CSRF验证失败",P1,自动化
+TC-SEC-016,安全,报名缴费,越权访问-查看他人缴费,已登录普通用户,步骤1:调用GET /api/payments,其他用户的payment_id,"预期1:返回403,msg包含无权限",P0,自动化
+TC-SEC-017,安全,学员管理,越权访问-修改他人学员,已登录普通用户,步骤1:调用PUT /api/students/999,其他用户的学员,"预期1:返回403,msg包含无权限",P0,自动化
+TC-SEC-018,安全,认证授权,敏感信息脱敏-日志,已登录,步骤1:登录操作|步骤2:查看日志,password=admin123,预期1:登录成功|预期2:日志中密码已脱敏,P1,自动化
+TC-SEC-019,安全,学员管理,敏感信息脱敏-导出,已登录,步骤1:导出学员数据|步骤2:查看Excel,包含手机号,预期1:导出成功|预期2:手机号部分脱敏(138****8000),P1,自动化
+TC-SEC-020,安全,认证授权,文件上传类型限制,已登录,步骤1:上传.exe文件,恶意文件,"预期1:返回400,msg包含文件类型不允许",P0,自动化
+TC-SEC-021,安全,认证授权,文件上传大小限制,已登录,步骤1:上传100MB文件,超大Excel,"预期1:返回400,msg包含文件过大",P0,自动化
+TC-SEC-022,安全,报名缴费,金额篡改防护,已登录,步骤1:调用POST /api/payments|步骤2:篡改金额参数,amount=-1000,"预期1:返回400,msg包含金额无效",P0,自动化
+TC-SEC-023,安全,学员管理,路径遍历攻击防护,已登录,步骤1:调用GET /api/students/../../etc/passwd,路径遍历,"预期1:返回400或404,无路径遍历",P0,自动化
+TC-SEC-024,安全,认证授权,HTTP头注入防护,已登录,步骤1:注入恶意HTTP头调用API,X-Forwarded-For: <script>,预期1:请求被拒绝或头部已过滤,P1,自动化
+TC-SEC-025,安全,认证授权,CORS跨域配置,无,步骤1:从非法域名调用API,Origin: http://evil.com,"预期1:返回CORS错误,请求被拒绝",P1,自动化
+TC-SMOKE-001,冒烟,认证,用户登录-正常流程-应成功登录,数据库存在admin用户,步骤1:打开登录页|步骤2:输入用户名admin|步骤3:输入密码admin123|步骤4:点击登录按钮,"username=admin,password=admin123","预期1:页面加载成功|预期2:用户名显示admin|预期3:密码显示密文|预期4:跳转首页,显示用户名admin",P0,自动化
+TC-SMOKE-002,冒烟,学员管理,创建学员-正常流程-应成功创建,已登录,步骤1:调用POST /api/students,"name=测试学员001,gender=男,age=20,phone=13800138000","预期1:返回201,包含student_id,数据库存在记录",P0,自动化
+TC-SMOKE-003,冒烟,课程管理,创建课程-正常流程-应成功创建,已登录,步骤1:调用POST /api/courses,"name=Python基础,category=编程,hours=40,price=2000","预期1:返回201,包含course_id,数据库存在记录",P0,自动化
+TC-SMOKE-004,冒烟,报名缴费,报名登记-正常流程-应成功报名,已登录且存在学员和课程,步骤1:调用POST /api/enrollments,"student_id=1,course_id=1","预期1:返回201,包含enrollment_id,数据库存在记录",P0,自动化
+TC-SMOKE-005,冒烟,考勤管理,考勤记录-正常流程-应成功记录,已登录且存在报名记录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-03-17,status=出勤","预期1:返回201,数据库存在记录",P0,自动化
+TC-UI-001,UI,统计分析,学员统计图表展示,已登录且存在数据,步骤1:访问统计页面|步骤2:查看学员统计图表,无,"预期1:页面加载成功|预期2:图表正确渲染,数据显示准确",P1,自动化
+TC-UI-002,UI,统计分析,收入趋势图展示,已登录且存在缴费数据,步骤1:访问统计页面|步骤2:查看收入趋势图,无,"预期1:页面加载成功|预期2:趋势图正确渲染,数据准确",P1,自动化
+TC-UI-003,UI,统计分析,仪表盘数据展示,已登录,步骤1:访问首页仪表盘|步骤2:查看关键指标,无,预期1:页面加载成功|预期2:关键指标显示正确,P0,自动化
+TC-UI-004,UI,认证授权,登录页面交互,无,步骤1:打开登录页|步骤2:输入用户名|步骤3:输入密码|步骤4:点击登录,"username=admin,password=admin123",预期1:页面加载|预期2:用户名显示|预期3:密码显示密文|预期4:登录成功跳转,P0,自动化

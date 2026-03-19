@@ -1,0 +1,15 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-API-ATT-001,接口,考勤管理,POST /api/attendances-正常考勤-应返回201,已登录且报名存在,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-03-17,status=出勤","预期1:状态码201,数据库存在记录",P0,自动化
+TC-API-ATT-002,接口,考勤管理,POST /api/attendances-学员未报名-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=99,date=2026-03-17","预期1:状态码400,msg包含学员未报名该课程",P0,自动化
+TC-API-ATT-003,接口,考勤管理,POST /api/attendances-日期格式错误-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-13-32","预期1:状态码400,msg包含日期格式错误",P0,自动化
+TC-API-ATT-004,接口,考勤管理,POST /api/attendances-未来日期-应返回400,已登录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2027-01-01","预期1:状态码400,msg包含不能记录未来考勤",P0,自动化
+TC-API-ATT-005,接口,考勤管理,GET /api/attendances-分页查询-应返回200,已登录,步骤1:调用GET /api/attendances,"page=1,per_page=10","预期1:状态码200,包含total/page/items",P0,自动化
+TC-API-ATT-006,接口,考勤管理,GET /api/attendances/rate-查询出勤率-应返回200,已登录,步骤1:调用GET /api/attendances/rate,student_id=1,"预期1:状态码200,返回出勤率,计算正确",P0,自动化
+TC-API-ATT-007,接口,考勤管理,POST /api/attendances-批量考勤-应返回201,已登录,步骤1:调用POST /api/attendances/batch,"[{student_id:1,course_id:1,date:2026-03-17,status:出勤},{...}]","预期1:状态码201,批量创建成功",P0,自动化
+TC-API-ATT-008,接口,考勤管理,POST /api/attendances-重复考勤-应拒绝,已登录且已考勤,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-03-17","预期1:状态码409,msg包含已存在考勤记录",P0,自动化
+TC-API-ATT-009,接口,考勤管理,PUT /api/attendances/:id-修改考勤-应返回200,已登录且考勤存在,步骤1:调用PUT /api/attendances/1,status=请假,"预期1:状态码200,数据库已更新",P0,自动化
+TC-API-ATT-010,接口,考勤管理,GET /api/attendances-按日期筛选-应返回200,已登录,步骤1:调用GET /api/attendances,date=2026-03-17,"预期1:状态码200,返回该日期所有考勤",P0,自动化
+TC-API-ATT-011,接口,考勤管理,GET /api/attendances-按状态筛选-应返回200,已登录,步骤1:调用GET /api/attendances,status=出勤,"预期1:状态码200,返回出勤记录",P0,自动化
+TC-API-ATT-012,接口,考勤管理,POST /api/leaves-提交请假-应返回201,已登录,步骤1:调用POST /api/leaves,"student_id=1,course_id=1,date=2026-03-18,reason=生病","预期1:状态码201,请假记录创建",P1,自动化
+TC-API-ATT-013,接口,考勤管理,PATCH /api/leaves/:id/approve-审批通过-应返回200,已登录管理员,步骤1:调用PATCH /api/leaves/1/approve,status=通过,"预期1:状态码200,审批状态更新",P1,自动化
+TC-API-ATT-014,接口,考勤管理,GET /api/leaves-查询请假列表-应返回200,已登录,步骤1:调用GET /api/leaves,无,"预期1:状态码200,返回请假列表",P1,自动化

@@ -1,0 +1,7 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-API-STAT-001,接口,统计分析,GET /api/statistics/dashboard-仪表盘数据-应返回200,已登录,"步骤1:调用GET /api/statistics/dashboard",无,"预期1:状态码200,返回学员总数/课程总数/报名总数/收入总额",P0,自动化
+TC-API-STAT-002,接口,统计分析,GET /api/statistics/students-学员统计-应返回200,已登录,"步骤1:调用GET /api/statistics/students",group_by=status,"预期1:状态码200,返回各状态学员数",P0,自动化
+TC-API-STAT-003,接口,统计分析,GET /api/statistics/revenue-收入统计-应返回200,已登录,"步骤1:调用GET /api/statistics/revenue","start_date=2026-03-01,end_date=2026-03-31","预期1:状态码200,返回月度收入数据",P0,自动化
+TC-API-STAT-004,接口,统计分析,GET /api/statistics/attendance-出勤率统计-应返回200,已登录,"步骤1:调用GET /api/statistics/attendance",course_id=1,"预期1:状态码200,返回课程出勤率",P0,自动化
+TC-API-STAT-005,接口,统计分析,GET /api/statistics/charts-图表数据-应返回200,已登录,"步骤1:调用GET /api/statistics/charts",type=revenue_trend,"预期1:状态码200,返回收入趋势图数据",P1,自动化
+TC-API-STAT-006,接口,统计分析,GET /api/statistics/enrollments-报名统计-应返回200,已登录,"步骤1:调用GET /api/statistics/enrollments",group_by=course,"预期1:状态码200,返回各课程报名数",P0,自动化

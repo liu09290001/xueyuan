@@ -1,0 +1,15 @@
+用例编号,接口名称,请求URL,请求方法,请求头,请求参数,测试数据,预期状态码,预期响应,优先级,用例类型
+ENR-API-001,报名登记,/api/enrollments,POST,Content-Type:application/json,studentId/courseId,{"studentId":1001,"courseId":2001},200,{"code":0,"data":{"id":3001}},P0,正向测试
+ENR-API-002,重复报名,/api/enrollments,POST,Content-Type:application/json,studentId/courseId,{"studentId":1001,"courseId":2001},409,{"code":40901,"msg":"该学员已报名此课程"},P0,异常测试
+ENR-API-003,缴费记录,/api/payments,POST,Content-Type:application/json,enrollmentId/amount/method/receiver,{"enrollmentId":3001,"amount":3000,"method":"微信","receiver":"王会计"},200,{"code":0,"data":{"id":4001}},P0,正向测试
+ENR-API-004,缴费金额为0,/api/payments,POST,Content-Type:application/json,enrollmentId/amount,{"enrollmentId":3001,"amount":0},400,{"code":40001,"msg":"缴费金额必须大于0"},P1,参数校验
+ENR-API-005,查询欠费学员,/api/enrollments/arrears,GET,Content-Type:application/json,page/pageSize,page=1&pageSize=10,200,{"code":0,"data":{"list":[]}},P0,正向测试
+ENR-API-006,生成收据,/api/payments/{id}/receipt,POST,Content-Type:application/json,id,id=4001,200,{"code":0,"data":{"receiptNo":"R202401001"}},P0,正向测试
+ENR-API-007,查询缴费历史,/api/payments,GET,Content-Type:application/json,studentId,studentId=1001,200,{"code":0,"data":{"list":[]}},P1,正向测试
+ENR-API-008,取消报名,/api/enrollments/{id},DELETE,Content-Type:application/json,id,id=3001,200,{"code":0,"msg":"success"},P1,正向测试
+ENR-API-009,查询报名详情,/api/enrollments/{id},GET,Content-Type:application/json,id,id=3001,200,{"code":0,"data":{"id":3001}},P0,正向测试
+ENR-API-010,课程满员报名,/api/enrollments,POST,Content-Type:application/json,studentId/courseId,{"studentId":1002,"courseId":2001},409,{"code":40902,"msg":"课程名额已满"},P1,异常测试
+ENR-API-011,按学员筛选报名,/api/enrollments,GET,Content-Type:application/json,student_id,student_id=1,200,{"code":0,"data":{"list":[]}},P0,筛选测试
+ENR-API-012,按课程筛选报名,/api/enrollments,GET,Content-Type:application/json,course_id,course_id=1,200,{"code":0,"data":{"list":[]}},P0,筛选测试
+ENR-API-013,按欠费状态筛选,/api/enrollments,GET,Content-Type:application/json,status,status=arrears,200,{"code":0,"data":{"list":[]}},P0,筛选测试
+ENR-API-014,按已缴清状态筛选,/api/enrollments,GET,Content-Type:application/json,status,status=paid,200,{"code":0,"data":{"list":[]}},P0,筛选测试

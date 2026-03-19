@@ -1,0 +1,6 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-SMOKE-001,冒烟,认证,用户登录-正常流程-应成功登录,数据库存在admin用户,步骤1:打开登录页|步骤2:输入用户名admin|步骤3:输入密码admin123|步骤4:点击登录按钮,"username=admin,password=admin123","预期1:页面加载成功|预期2:用户名显示admin|预期3:密码显示密文|预期4:跳转首页,显示用户名admin",P0,自动化
+TC-SMOKE-002,冒烟,学员管理,创建学员-正常流程-应成功创建,已登录,步骤1:调用POST /api/students,"name=测试学员001,gender=男,age=20,phone=13800138000","预期1:返回201,包含student_id,数据库存在记录",P0,自动化
+TC-SMOKE-003,冒烟,课程管理,创建课程-正常流程-应成功创建,已登录,步骤1:调用POST /api/courses,"name=Python基础,category=编程,hours=40,price=2000","预期1:返回201,包含course_id,数据库存在记录",P0,自动化
+TC-SMOKE-004,冒烟,报名缴费,报名登记-正常流程-应成功报名,已登录且存在学员和课程,步骤1:调用POST /api/enrollments,"student_id=1,course_id=1","预期1:返回201,包含enrollment_id,数据库存在记录",P0,自动化
+TC-SMOKE-005,冒烟,考勤管理,考勤记录-正常流程-应成功记录,已登录且存在报名记录,步骤1:调用POST /api/attendances,"student_id=1,course_id=1,date=2026-03-17,status=出勤","预期1:返回201,数据库存在记录",P0,自动化

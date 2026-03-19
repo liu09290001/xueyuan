@@ -1,0 +1,7 @@
+用例编号,接口名称,请求URL,请求方法,请求头,请求参数,测试数据,预期状态码,预期响应,优先级,用例类型
+STA-API-001,按课程统计学员,/api/statistics/students,GET,Content-Type:application/json,groupBy,groupBy=course,200,{"code":0,"data":[]},P0,正向测试
+STA-API-002,按状态统计学员,/api/statistics/students,GET,Content-Type:application/json,groupBy,groupBy=status,200,{"code":0,"data":[]},P0,正向测试
+STA-API-003,按日统计收入,/api/statistics/income,GET,Content-Type:application/json,type/date,type=day&date=2024-01-15,200,{"code":0,"data":{"amount":0}},P0,正向测试
+STA-API-004,按月统计收入,/api/statistics/income,GET,Content-Type:application/json,type/month,type=month&month=2024-01,200,{"code":0,"data":{"amount":0}},P0,正向测试
+STA-API-005,按年统计收入,/api/statistics/income,GET,Content-Type:application/json,type/year,type=year&year=2024,200,{"code":0,"data":{"amount":0}},P1,正向测试
+STA-API-006,课程出勤率统计,/api/statistics/attendance,GET,Content-Type:application/json,无,无,200,{"code":0,"data":[]},P0,正向测试

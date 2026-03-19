@@ -1,0 +1,21 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-API-CRS-001,接口,课程管理,POST /api/courses-正常创建-应返回201,已登录,"步骤1:调用POST /api/courses","name=Python基础,category=编程,hours=40,price=2000","预期1:状态码201,包含course_id,数据库存在记录",P0,自动化
+TC-API-CRS-002,接口,课程管理,POST /api/courses-名称为空-应返回400,已登录,"步骤1:调用POST /api/courses","name=,hours=40,price=2000","预期1:状态码400,msg包含名称不能为空",P0,自动化
+TC-API-CRS-003,接口,课程管理,POST /api/courses-课时为0-应返回400,已登录,"步骤1:调用POST /api/courses","name=Python,hours=0,price=2000","预期1:状态码400,msg包含课时必须大于0",P0,自动化
+TC-API-CRS-004,接口,课程管理,POST /api/courses-单价为0-应返回400,已登录,"步骤1:调用POST /api/courses","name=Python,hours=40,price=0","预期1:状态码400,msg包含单价必须大于0",P0,自动化
+TC-API-CRS-005,接口,课程管理,GET /api/courses-分页查询-应返回200,已登录,"步骤1:调用GET /api/courses","page=1,per_page=10","预期1:状态码200,包含total/page/items",P0,自动化
+TC-API-CRS-006,接口,课程管理,GET /api/courses-按类别筛选-应返回200,已登录,"步骤1:调用GET /api/courses",category=编程,"预期1:状态码200,返回课程类别均为编程",P0,自动化
+TC-API-CRS-007,接口,课程管理,GET /api/courses/:id-正常查询-应返回200,已登录且课程存在,"步骤1:调用GET /api/courses/1",无,"预期1:状态码200,返回课程完整信息",P0,自动化
+TC-API-CRS-008,接口,课程管理,GET /api/courses/:id-不存在-应返回404,已登录,"步骤1:调用GET /api/courses/99999",无,"预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-API-CRS-009,接口,课程管理,PUT /api/courses/:id-正常更新-应返回200,已登录且课程存在,"步骤1:调用PUT /api/courses/1","name=Python进阶,price=3000","预期1:状态码200,数据库已更新",P0,自动化
+TC-API-CRS-010,接口,课程管理,DELETE /api/courses/:id-正常删除-应返回200,已登录且课程无报名,"步骤1:调用DELETE /api/courses/1",无,"预期1:状态码200,数据库已删除",P0,自动化
+TC-API-CRS-011,接口,课程管理,DELETE /api/courses/:id-有报名记录-应返回409,已登录且课程有报名,"步骤1:调用DELETE /api/courses/1",无,"预期1:状态码409,msg包含存在报名记录",P0,自动化
+TC-API-CRS-012,接口,课程管理,POST /api/courses-课时负数-应拒绝,已登录,"步骤1:调用POST /api/courses","name=Python,hours=-10,price=2000","预期1:状态码400,msg包含课时必须大于0",P0,自动化
+TC-API-CRS-013,接口,课程管理,POST /api/courses-单价负数-应拒绝,已登录,"步骤1:调用POST /api/courses","name=Python,hours=40,price=-100","预期1:状态码400,msg包含单价必须大于0",P0,自动化
+TC-API-CRS-014,接口,课程管理,GET /api/courses-按名称搜索-应返回200,已登录,"步骤1:调用GET /api/courses",keyword=Python,"预期1:状态码200,返回名称包含Python的课程",P0,自动化
+TC-API-CRS-015,接口,课程管理,GET /api/courses-组合筛选-应返回200,已登录,"步骤1:调用GET /api/courses","category=编程,keyword=Python","预期1:状态码200,返回编程类且名称包含Python的课程",P0,自动化
+TC-API-CRS-016,接口,课程管理,PUT /api/courses/:id-课程不存在-应返回404,已登录,"步骤1:调用PUT /api/courses/99999",name=新名称,"预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-API-CRS-017,接口,课程管理,POST /api/courses/:id/schedule-教室冲突-应拒绝,已登录且时间段已被占用,"步骤1:调用POST /api/courses/1/schedule","teacher_id=1,room_id=1,time=2026-03-17 09:00","预期1:状态码409,msg包含教室冲突",P0,自动化
+TC-API-CRS-018,接口,课程管理,POST /api/courses/:id/schedule-教师冲突-应拒绝,已登录且教师时间冲突,"步骤1:调用POST /api/courses/1/schedule","teacher_id=1,room_id=2,time=2026-03-17 09:00","预期1:状态码409,msg包含教师冲突",P0,自动化
+TC-API-CRS-019,接口,课程管理,GET /api/courses/:id/students-查询已报名学员-应返回200,已登录且课程有报名,"步骤1:调用GET /api/courses/1/students",无,"预期1:状态码200,返回已报名学员列表",P0,自动化
+TC-API-CRS-020,接口,课程管理,GET /api/courses/count-统计课程数-应返回200,已登录,"步骤1:调用GET /api/courses/count",无,"预期1:状态码200,返回课程总数",P0,自动化

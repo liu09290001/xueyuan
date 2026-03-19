@@ -1,0 +1,12 @@
+用例编号,接口名称,请求URL,请求方法,请求头,请求参数,测试数据,预期状态码,预期响应,优先级,用例类型
+ATT-API-001,记录考勤,/api/attendances,POST,Content-Type:application/json,courseId/studentId/status/date,{"courseId":2001,"studentId":1001,"status":"出勤","date":"2024-01-15"},200,{"code":0,"msg":"success"},P0,正向测试
+ATT-API-002,批量记录考勤,/api/attendances/batch,POST,Content-Type:application/json,courseId/records,{"courseId":2001,"records":[{"studentId":1001,"status":"出勤"}]},200,{"code":0,"msg":"success"},P0,正向测试
+ATT-API-003,提交请假申请,/api/leaves,POST,Content-Type:application/json,studentId/date/reason,{"studentId":1001,"date":"2024-01-15","reason":"生病"},200,{"code":0,"data":{"id":5001}},P0,正向测试
+ATT-API-004,审批请假,/api/leaves/{id}/approve,PATCH,Content-Type:application/json,id/approved,{"approved":true},200,{"code":0,"msg":"success"},P0,正向测试
+ATT-API-005,驳回请假,/api/leaves/{id}/approve,PATCH,Content-Type:application/json,id/approved/reason,{"approved":false,"reason":"资料不全"},200,{"code":0,"msg":"success"},P1,正向测试
+ATT-API-006,查询学员出勤率,/api/attendances/rate,GET,Content-Type:application/json,studentId,studentId=1001,200,{"code":0,"data":{"rate":95.5}},P0,正向测试
+ATT-API-007,查询课程出勤率,/api/attendances/rate,GET,Content-Type:application/json,courseId,courseId=2001,200,{"code":0,"data":{"rate":92.0}},P0,正向测试
+ATT-API-008,修改考勤记录,/api/attendances/{id},PUT,Content-Type:application/json,id/status,{"status":"请假"},200,{"code":0,"msg":"success"},P1,正向测试
+ATT-API-009,按学员筛选考勤,/api/attendances,GET,Content-Type:application/json,student_id,student_id=1,200,{"code":0,"data":{"list":[]}},P0,筛选测试
+ATT-API-010,获取学员已报名课程,/api/students/{id}/enrolled-courses,GET,Content-Type:application/json,id,id=1,200,{"code":0,"data":[]},P0,正向测试
+ATT-API-011,未报名录入考勤拒绝,/api/attendances,POST,Content-Type:application/json,student_id/course_id,{"student_id":1,"course_id":99999,"date":"2026-01-01","status":"出勤"},400,{"code":40001,"msg":"该学员未报名此课程"},P0,约束测试

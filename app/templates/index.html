@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}仪表盘 - 学员管理系统{% endblock %}
+{% block extra_css %}
+<style>
+    .welcome-banner {
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border-radius: 12px; padding: 18px 24px; color: #fff; margin-bottom: 20px;
+        position: relative; overflow: hidden;
+    }
+    .welcome-banner::before {
+        content: ''; position: absolute; right: -40px; top: -40px;
+        width: 150px; height: 150px; background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    .welcome-banner h2 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .welcome-banner p { opacity: 0.9; margin: 0; font-size: 13px; }
+    .welcome-banner .date { font-size: 12px; opacity: 0.8; margin-top: 8px; }
+    .stat-card { padding: 14px !important; }
+    .stat-card .stat-icon { width: 38px; height: 38px; font-size: 16px; }
+    .stat-card h3 { font-size: 22px; }
+    .stat-card p { font-size: 12px; }
+    .stat-card small { font-size: 11px; }
+    .stat-card .mt-3 { margin-top: 10px !important; padding-top: 10px !important; }
+</style>
+{% endblock %}
+{% block content %}
+<!-- 欢迎横幅 -->
+<div class="welcome-banner">
+    <h2>欢迎回来，管理员</h2>
+    <p>今天也是充满活力的一天，一起来看看学员们的学习情况吧</p>
+    <div class="date" id="currentDate"></div>
+</div>
+
+<!-- 统计卡片 -->
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="card stat-card h-100" style="border-left:4px solid #4f46e5;">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon me-3" style="background:#eef2ff;color:#4f46e5;">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <p>学员总数</p>
+                    <h3 id="studentCount">-</h3>
+                </div>
+            </div>
+            <div class="mt-3 pt-3" style="border-top:1px solid #f3f4f6;">
+                <small class="text-muted"><i class="fas fa-arrow-up text-success me-1"></i>在读学员为主</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100" style="border-left:4px solid #10b981;">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon me-3" style="background:#d1fae5;color:#10b981;">
+                    <i class="fas fa-book-open"></i>
+                </div>
+                <div>
+                    <p>课程数量</p>
+                    <h3 id="courseCount">-</h3>
+                </div>
+            </div>
+            <div class="mt-3 pt-3" style="border-top:1px solid #f3f4f6;">
+                <small class="text-muted"><i class="fas fa-check-circle text-success me-1"></i>课程开设中</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100" style="border-left:4px solid #f59e0b;">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon me-3" style="background:#fef3c7;color:#f59e0b;">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <p>报名人次</p>
+                    <h3 id="enrollmentCount">-</h3>
+                </div>
+            </div>
+            <div class="mt-3 pt-3" style="border-top:1px solid #f3f4f6;">
+                <small class="text-muted"><i class="fas fa-chart-line text-warning me-1"></i>持续增长中</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card h-100" style="border-left:4px solid #ef4444;">
+            <div class="d-flex align-items-center">
+                <div class="stat-icon me-3" style="background:#fee2e2;color:#ef4444;">
+                    <i class="fas fa-yen-sign"></i>
+                </div>
+                <div>
+                    <p>本月收入</p>
+                    <h3>¥<span id="monthIncome">-</span></h3>
+                </div>
+            </div>
+            <div class="mt-3 pt-3" style="border-top:1px solid #f3f4f6;">
+                <small class="text-muted"><i class="fas fa-calendar-alt text-danger me-1"></i>本月累计</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+// 显示当前日期
+var now = new Date();
+var weekDays = ['日','一','二','三','四','五','六'];
+$('#currentDate').text(now.getFullYear() + '年' + (now.getMonth()+1) + '月' + now.getDate() + '日 星期' + weekDays[now.getDay()]);
+
+$(function(){
+    $.get('/api/statistics/dashboard', function(res){
+        if(res.code === 0){
+            $('#studentCount').text(res.data.student_count);
+            $('#courseCount').text(res.data.course_count);
+            $('#enrollmentCount').text(res.data.enrollment_count);
+            $('#monthIncome').text(res.data.month_income.toLocaleString());
+        }
+    });
+});
+</script>
+{% endblock %}

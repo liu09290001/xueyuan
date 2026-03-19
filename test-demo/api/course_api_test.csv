@@ -1,0 +1,12 @@
+用例编号,接口名称,请求URL,请求方法,请求头,请求参数,测试数据,预期状态码,预期响应,优先级,用例类型
+CRS-API-001,新增课程,/api/courses,POST,Content-Type:application/json,name/category/hours/price/validity,{"name":"Python基础","category":"编程","hours":48,"price":3000,"validity":12},200,{"code":0,"data":{"id":1001}},P0,正向测试
+CRS-API-002,新增课程-名称为空,/api/courses,POST,Content-Type:application/json,name/category/hours/price,{"name":"","category":"编程","hours":48,"price":3000},400,{"code":40001,"msg":"课程名称不能为空"},P0,参数校验
+CRS-API-003,查询课程列表,/api/courses,GET,Content-Type:application/json,page/pageSize/category,page=1&pageSize=10,200,{"code":0,"data":{"list":[],"total":0}},P0,正向测试
+CRS-API-004,查询课程详情,/api/courses/{id},GET,Content-Type:application/json,id,id=1001,200,{"code":0,"data":{"id":1001,"name":"Python基础"}},P0,正向测试
+CRS-API-005,更新课程信息,/api/courses/{id},PUT,Content-Type:application/json,id/price,{"price":3500},200,{"code":0,"msg":"success"},P0,正向测试
+CRS-API-006,删除课程,/api/courses/{id},DELETE,Content-Type:application/json,id,id=1001,200,{"code":0,"msg":"success"},P1,正向测试
+CRS-API-007,课程安排,/api/courses/{id}/schedule,POST,Content-Type:application/json,teacherId/roomId/time,{"teacherId":1,"roomId":"A101","time":"周一9:00"},200,{"code":0,"msg":"success"},P0,正向测试
+CRS-API-008,课程安排-时间冲突,/api/courses/{id}/schedule,POST,Content-Type:application/json,teacherId/roomId/time,{"teacherId":1,"roomId":"A101","time":"周一9:00"},409,{"code":40901,"msg":"该时间段教室已被占用"},P0,异常测试
+CRS-API-009,按类别筛选课程,/api/courses,GET,Content-Type:application/json,category,category=编程,200,{"code":0,"data":{"list":[]}},P1,正向测试
+CRS-API-010,按状态筛选课程,/api/courses,GET,Content-Type:application/json,status,status=开课中,200,{"code":0,"data":{"list":[]}},P1,正向测试
+CRS-API-011,删除有报名课程,/api/courses/{id},DELETE,Content-Type:application/json,id,id=1,409,{"code":40901,"msg":"该课程有报名记录无法删除"},P0,约束测试

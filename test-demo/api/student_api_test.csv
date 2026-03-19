@@ -1,0 +1,14 @@
+用例编号,接口名称,请求URL,请求方法,请求头,请求参数,测试数据,预期状态码,预期响应,优先级,用例类型
+STU-API-001,新增学员,/api/students,POST,Content-Type:application/json,name/gender/age/phone/emergency_contact,{"name":"张三","gender":"男","age":18,"phone":"13800138000","emergency_contact":"李四"},200,{"code":0,"msg":"success","data":{"id":1001}},P0,正向测试
+STU-API-002,新增学员-姓名为空,/api/students,POST,Content-Type:application/json,name/gender/age/phone,{"name":"","gender":"男","age":18,"phone":"13800138000"},400,{"code":40001,"msg":"姓名不能为空"},P0,参数校验
+STU-API-003,新增学员-手机号格式错误,/api/students,POST,Content-Type:application/json,name/gender/age/phone,{"name":"张三","gender":"男","age":18,"phone":"123"},400,{"code":40002,"msg":"手机号格式不正确"},P1,参数校验
+STU-API-004,查询学员列表,/api/students,GET,Content-Type:application/json,page/pageSize/status,page=1&pageSize=10&status=在读,200,{"code":0,"data":{"list":[],"total":0}},P0,正向测试
+STU-API-005,查询学员详情,/api/students/{id},GET,Content-Type:application/json,id,id=1001,200,{"code":0,"data":{"id":1001,"name":"张三"}},P0,正向测试
+STU-API-006,查询不存在学员,/api/students/{id},GET,Content-Type:application/json,id,id=9999,404,{"code":40401,"msg":"学员不存在"},P1,异常测试
+STU-API-007,更新学员信息,/api/students/{id},PUT,Content-Type:application/json,id/name/phone,{"id":1001,"phone":"13900139000"},200,{"code":0,"msg":"success"},P0,正向测试
+STU-API-008,更新学员状态,/api/students/{id}/status,PATCH,Content-Type:application/json,id/status,{"status":"休学"},200,{"code":0,"msg":"success"},P0,正向测试
+STU-API-009,删除学员,/api/students/{id},DELETE,Content-Type:application/json,id,id=1001,200,{"code":0,"msg":"success"},P1,正向测试
+STU-API-010,批量导入学员,/api/students/import,POST,Content-Type:multipart/form-data,file,Excel文件,200,{"code":0,"data":{"success":10,"fail":0}},P0,正向测试
+STU-API-011,批量导出学员,/api/students/export,GET,Content-Type:application/json,status,status=在读,200,返回Excel文件流,P0,正向测试
+STU-API-012,未授权访问,/api/students,GET,无Authorization,无,无,401,{"code":40101,"msg":"未授权访问"},P0,权限测试
+STU-API-013,删除有报名学员,/api/students/{id},DELETE,Content-Type:application/json,id,id=1,409,{"code":40901,"msg":"该学员有报名记录无法删除"},P0,约束测试

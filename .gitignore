@@ -1,0 +1,24 @@
+__pycache__/
+*.py[cod]
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# Local IDE / agent state
+.claude/
+
+# Local runtime data
+instance/*.db
+*.sqlite
+*.sqlite3
+
+# Generated test artifacts
+test/reports/
+test-demo/reports/
+
+# Windows oddities
+nul

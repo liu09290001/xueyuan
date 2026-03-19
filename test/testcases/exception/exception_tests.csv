@@ -1,0 +1,19 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-EXCEP-001,异常,学员管理,创建学员-姓名为空-应拒绝,已登录,"步骤1:调用POST /api/students","name=,gender=男","预期1:状态码400,msg包含姓名不能为空",P0,自动化
+TC-EXCEP-002,异常,学员管理,创建学员-仅空格-应拒绝,已登录,"步骤1:调用POST /api/students","name=   ,gender=男","预期1:状态码400,msg包含姓名不能为空",P0,自动化
+TC-EXCEP-003,异常,学员管理,创建学员-特殊字符-应转义,已登录,"步骤1:调用POST /api/students","name=<script>alert(1)</script>","预期1:状态码201,姓名已转义保存",P0,自动化
+TC-EXCEP-004,异常,学员管理,搜索学员-SQL注入-应防护,已登录,"步骤1:调用GET /api/students","keyword=' OR 1=1--","预期1:状态码200,不影响查询,无SQL注入",P0,自动化
+TC-EXCEP-005,异常,学员管理,删除不存在学员-应返回404,已登录,"步骤1:调用DELETE /api/students/99999",无,"预期1:状态码404,msg包含学员不存在",P0,自动化
+TC-EXCEP-006,异常,课程管理,删除不存在课程-应返回404,已登录,"步骤1:调用DELETE /api/courses/99999",无,"预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-EXCEP-007,异常,报名缴费,报名不存在学员-应返回404,已登录,"步骤1:调用POST /api/enrollments","student_id=99999,course_id=1","预期1:状态码404,msg包含学员不存在",P0,自动化
+TC-EXCEP-008,异常,考勤管理,未来日期考勤-应拒绝,已登录,"步骤1:调用POST /api/attendances","date=2027-01-01,student_id=1","预期1:状态码400,msg包含不能记录未来考勤",P0,自动化
+TC-EXCEP-009,异常,考勤管理,日期格式错误-应拒绝,已登录,"步骤1:调用POST /api/attendances","date=2026-13-32,student_id=1","预期1:状态码400,msg包含日期格式错误",P0,自动化
+TC-EXCEP-010,异常,报名缴费,重复报名-应拒绝,已登录且已报名,"步骤1:调用POST /api/enrollments","student_id=1,course_id=1","预期1:状态码409,msg包含已报名",P0,自动化
+TC-EXCEP-011,异常,学员管理,更新不存在学员-应返回404,已登录,"步骤1:调用PUT /api/students/99999",name=新名称,"预期1:状态码404,msg包含学员不存在",P0,自动化
+TC-EXCEP-012,异常,课程管理,更新不存在课程-应返回404,已登录,"步骤1:调用PUT /api/courses/99999",name=新名称,"预期1:状态码404,msg包含课程不存在",P0,自动化
+TC-EXCEP-013,异常,报名缴费,缴费金额为字符串-应拒绝,已登录,"步骤1:调用POST /api/payments","enrollment_id=1,amount=abc","预期1:状态码400,msg包含金额格式错误",P0,自动化
+TC-EXCEP-014,异常,学员管理,年龄为字符串-应拒绝,已登录,"步骤1:调用POST /api/students","name=张三,age=abc","预期1:状态码400,msg包含年龄格式错误",P0,自动化
+TC-EXCEP-015,异常,考勤管理,状态值非法-应拒绝,已登录,"步骤1:调用POST /api/attendances","student_id=1,course_id=1,status=非法状态","预期1:状态码400,msg包含状态值非法",P0,自动化
+TC-EXCEP-016,异常,学员管理,手机号格式错误-应拒绝,已登录,"步骤1:调用POST /api/students","name=张三,phone=123","预期1:状态码400,msg包含手机号格式错误",P0,自动化
+TC-EXCEP-017,异常,报名缴费,报名ID为字符串-应拒绝,已登录,"步骤1:调用POST /api/payments","enrollment_id=abc,amount=1000","预期1:状态码400,msg包含报名ID格式错误",P0,自动化
+TC-EXCEP-018,异常,学员管理,JSON格式错误-应拒绝,已登录,"步骤1:调用POST /api/students",发送非JSON数据,"预期1:状态码400,msg包含请求格式错误",P0,自动化

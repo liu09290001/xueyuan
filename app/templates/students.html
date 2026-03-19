@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}学员管理 - 学员管理系统{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-users"></i>学员管理</h4>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentModal" onclick="openAdd()">
+        <i class="fas fa-plus me-2"></i>新增学员
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选栏 -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="keyword" placeholder="搜索姓名...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="status">
+                    <option value="">全部状态</option>
+                    <option value="在读">在读</option>
+                    <option value="休学">休学</option>
+                    <option value="结业">结业</option>
+                    <option value="退学">退学</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" onclick="loadStudents(1)">
+                    <i class="fas fa-filter me-1"></i>筛选
+                </button>
+            </div>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>序号</th><th>姓名</th><th>性别</th><th>年龄</th>
+                        <th>联系电话</th><th>状态</th><th>创建时间</th><th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="studentList"></tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-muted" id="pageInfo">共 0 条记录</div>
+            <nav><ul class="pagination" id="pagination"></ul></nav>
+        </div>
+    </div>
+</div>
+
+<!-- 状态切换模态框 -->
+<div class="modal fade" id="statusModal">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">切换状态</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="statusContent"></div>
+            <input type="hidden" id="statusStudentId">
+        </div>
+    </div>
+</div>
+
+<!-- 学员模态框 -->
+<div class="modal fade" id="studentModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">新增学员</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="mb-3">
+                    <label class="form-label">姓名 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" placeholder="请输入姓名">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">性别</label>
+                        <select class="form-select" id="gender">
+                            <option value="">请选择</option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">年龄</label>
+                        <input type="number" class="form-control" id="age" placeholder="请输入年龄">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">联系电话</label>
+                    <input type="text" class="form-control" id="phone" placeholder="请输入电话">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveStudent()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+var currentPage = 1, totalPages = 1, perPage = 10;
+
+$(function(){ loadStudents(1); });
+
+function loadStudents(page){
+    currentPage = page || 1;
+    $('#studentList').html('<tr><td colspan="8" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>加载中...</td></tr>');
+
+    $.get('/api/students', {
+        page: currentPage, per_page: perPage,
+        keyword: $('#keyword').val(), status: $('#status').val()
+    }, function(res){
+        if(res.code === 0){
+            var html = '', list = res.data.list, total = res.data.total;
+            totalPages = Math.ceil(total / perPage);
+
+            if(list.length === 0){
+                html = '<tr><td colspan="8" class="text-center text-muted py-4">暂无数据</td></tr>';
+            } else {
+                list.forEach(function(s, index){
+                    var rowNum = (currentPage - 1) * perPage + index + 1;
+                    var statusClass = {'在读':'success','休学':'warning','结业':'info','退学':'secondary'}[s.status] || 'secondary';
+                    html += '<tr>';
+                    html += '<td>' + rowNum + '</td>';
+                    html += '<td><strong>' + s.name + '</strong></td>';
+                    html += '<td>' + (s.gender || '-') + '</td>';
+                    html += '<td>' + (s.age || '-') + '</td>';
+                    html += '<td>' + (s.phone || '-') + '</td>';
+                    html += '<td><span class="badge bg-' + statusClass + '" style="cursor:pointer;" onclick="changeStatus(' + s.id + ',\'' + s.status + '\')">' + s.status + ' <i class="fas fa-caret-down ms-1"></i></span></td>';
+                    html += '<td>' + s.created_at + '</td>';
+                    html += '<td>';
+                    html += '<button class="btn btn-sm btn-outline-primary me-1" onclick="editStudent(' + s.id + ')"><i class="fas fa-edit"></i></button>';
+                    html += '<button class="btn btn-sm btn-outline-danger" onclick="deleteStudent(' + s.id + ')"><i class="fas fa-trash"></i></button>';
+                    html += '</td></tr>';
+                });
+            }
+            $('#studentList').html(html);
+            $('#pageInfo').text('共 ' + total + ' 条记录');
+            renderPagination();
+        }
+    }).fail(function(){
+        $('#studentList').html('<tr><td colspan="8" class="text-center text-danger py-4">加载失败</td></tr>');
+    });
+}
+
+function renderPagination(){
+    var html = '';
+    html += '<li class="page-item ' + (currentPage <= 1 ? 'disabled' : '') + '">';
+    html += '<a class="page-link" href="javascript:void(0)" onclick="loadStudents(' + (currentPage-1) + ')">上一页</a></li>';
+
+    for(var i = 1; i <= totalPages; i++){
+        if(i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)){
+            html += '<li class="page-item ' + (i === currentPage ? 'active' : '') + '">';
+            html += '<a class="page-link" href="javascript:void(0)" onclick="loadStudents(' + i + ')">' + i + '</a></li>';
+        } else if(i === currentPage - 3 || i === currentPage + 3){
+            html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+
+    html += '<li class="page-item ' + (currentPage >= totalPages ? 'disabled' : '') + '">';
+    html += '<a class="page-link" href="javascript:void(0)" onclick="loadStudents(' + (currentPage+1) + ')">下一页</a></li>';
+    $('#pagination').html(html);
+}
+
+function openAdd(){
+    $('#editId').val(''); $('#modalTitle').text('新增学员');
+    $('#name,#phone,#age').val(''); $('#gender').val('');
+}
+
+function editStudent(id){
+    $.get('/api/students/' + id, function(res){
+        if(res.code === 0){
+            $('#editId').val(id); $('#modalTitle').text('编辑学员');
+            $('#name').val(res.data.name); $('#gender').val(res.data.gender);
+            $('#age').val(res.data.age); $('#phone').val(res.data.phone);
+            new bootstrap.Modal($('#studentModal')).show();
+        }
+    });
+}
+
+function saveStudent(){
+    var id = $('#editId').val();
+    var data = {name:$('#name').val(), gender:$('#gender').val(), age:$('#age').val(), phone:$('#phone').val()};
+    $.ajax({
+        url: id ? '/api/students/' + id : '/api/students',
+        method: id ? 'PUT' : 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(res){
+            if(res.code === 0){
+                bootstrap.Modal.getInstance($('#studentModal')).hide();
+                loadStudents(currentPage);
+            } else { alert(res.msg); }
+        }
+    });
+}
+
+function deleteStudent(id){
+    if(confirm('确定删除该学员?')){
+        $.ajax({
+            url:'/api/students/' + id,
+            method:'DELETE',
+            success:function(res){
+                if(res.code === 0) loadStudents(currentPage);
+                else alert(res.msg);
+            },
+            error:function(xhr){
+                var msg = xhr.responseJSON ? xhr.responseJSON.msg : '删除失败';
+                alert(msg);
+            }
+        });
+    }
+}
+
+function changeStatus(id, currentStatus){
+    var statuses = ['在读','休学','结业','退学'];
+    var html = '<div class="list-group">';
+    statuses.forEach(function(s){
+        var active = s === currentStatus ? ' active' : '';
+        html += '<a href="javascript:void(0)" class="list-group-item list-group-item-action' + active + '" onclick="updateStatus(' + id + ',\'' + s + '\')">' + s + '</a>';
+    });
+    html += '</div>';
+    $('#statusContent').html(html);
+    $('#statusStudentId').val(id);
+    new bootstrap.Modal($('#statusModal')[0]).show();
+}
+
+function updateStatus(id, status){
+    $.ajax({
+        url: '/api/students/' + id + '/status',
+        method: 'PATCH',
+        contentType: 'application/json',
+        data: JSON.stringify({status: status}),
+        success: function(res){
+            if(res.code === 0){
+                bootstrap.Modal.getInstance($('#statusModal')[0]).hide();
+                loadStudents(currentPage);
+            } else { alert(res.msg); }
+        }
+    });
+}
+</script>
+{% endblock %}

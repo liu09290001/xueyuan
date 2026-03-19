@@ -1,0 +1,9 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-API-AUTH-001,接口,认证授权,POST /api/login-正常登录-应返回200,数据库存在admin用户,"步骤1:调用POST /api/login","username=admin,password=admin123","预期1:状态码200,响应包含token,token非空",P0,自动化
+TC-API-AUTH-002,接口,认证授权,POST /api/login-密码错误-应返回401,数据库存在admin用户,"步骤1:调用POST /api/login","username=admin,password=wrong","预期1:状态码401,msg包含密码错误",P0,自动化
+TC-API-AUTH-003,接口,认证授权,POST /api/login-用户不存在-应返回401,无,"步骤1:调用POST /api/login","username=notexist,password=any","预期1:状态码401,msg包含用户不存在",P0,自动化
+TC-API-AUTH-004,接口,认证授权,POST /api/login-用户名为空-应返回400,无,"步骤1:调用POST /api/login","username=,password=admin123","预期1:状态码400,msg包含用户名不能为空",P0,自动化
+TC-API-AUTH-005,接口,认证授权,POST /api/login-密码为空-应返回400,无,"步骤1:调用POST /api/login","username=admin,password=","预期1:状态码400,msg包含密码不能为空",P0,自动化
+TC-API-AUTH-006,接口,认证授权,POST /api/logout-正常登出-应返回200,已登录,"步骤1:调用POST /api/logout",携带有效token,"预期1:状态码200,msg为登出成功",P0,自动化
+TC-API-AUTH-007,接口,认证授权,GET /api/students-未登录访问-应返回401,无token,"步骤1:调用GET /api/students",不携带token,"预期1:状态码401,msg包含未登录",P0,自动化
+TC-API-AUTH-008,接口,认证授权,GET /api/students-Token过期-应返回401,token已过期,"步骤1:调用GET /api/students",携带过期token,"预期1:状态码401,msg包含token过期",P0,自动化

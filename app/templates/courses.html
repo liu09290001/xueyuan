@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block title %}课程管理 - 学员管理系统{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-book-open"></i>课程管理</h4>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#courseModal" onclick="openAdd()">
+        <i class="fas fa-plus me-2"></i>新增课程
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选栏 -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control" id="keyword" placeholder="搜索课程名称...">
+                </div>
+            </div>
+            <div class="col-md-2">
+                <select class="form-select" id="category">
+                    <option value="">全部类别</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-primary" onclick="loadCourses(1)">
+                    <i class="fas fa-filter me-1"></i>筛选
+                </button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr><th>序号</th><th>课程名称</th><th>类别</th><th>课时</th><th>单价</th><th>教师</th><th>操作</th></tr>
+                </thead>
+                <tbody id="courseList"></tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-muted" id="pageInfo">共 0 条记录</div>
+            <nav><ul class="pagination" id="pagination"></ul></nav>
+        </div>
+    </div>
+</div>
+
+<!-- 课程模态框 -->
+<div class="modal fade" id="courseModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">新增课程</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editId">
+                <div class="mb-3">
+                    <label class="form-label">课程名称 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" id="name" placeholder="请输入课程名称">
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">类别</label>
+                        <input type="text" class="form-control" id="category" placeholder="如：编程、美术">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">课时</label>
+                        <input type="number" class="form-control" id="hours" min="1">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">单价 (元)</label>
+                        <input type="number" class="form-control" id="price" min="0">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">教师</label>
+                        <input type="text" class="form-control" id="teacher">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" onclick="saveCourse()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+var currentPage = 1, totalPages = 1, perPage = 10;
+$(function(){
+    loadCategories();
+    loadCourses(1);
+});
+
+function loadCategories(){
+    $.get('/api/courses', {per_page:100}, function(res){
+        var cats = {};
+        if(res.data && res.data.list){
+            res.data.list.forEach(function(c){ if(c.category) cats[c.category] = 1; });
+        }
+        var html = '<option value="">全部类别</option>';
+        Object.keys(cats).forEach(function(c){ html += '<option value="'+c+'">'+c+'</option>'; });
+        $('#category').html(html);
+    });
+}
+
+function loadCourses(page){
+    currentPage = page || 1;
+    $('#courseList').html('<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>加载中...</td></tr>');
+    $.get('/api/courses', {
+        page: currentPage, per_page: perPage,
+        keyword: $('#keyword').val(), category: $('#category').val()
+    }, function(res){
+        if(res.code === 0){
+            var html = '', list = res.data.list, total = res.data.total || list.length;
+            totalPages = Math.ceil(total / perPage) || 1;
+            if(list.length === 0){
+                html = '<tr><td colspan="7" class="text-center text-muted py-4">暂无数据</td></tr>';
+            } else {
+                list.forEach(function(c, index){
+                    var rowNum = (currentPage - 1) * perPage + index + 1;
+                    html += '<tr><td>' + rowNum + '</td>';
+                    html += '<td><strong>' + c.name + '</strong></td>';
+                    html += '<td><span class="badge bg-info">' + (c.category || '-') + '</span></td>';
+                    html += '<td>' + (c.hours || '-') + ' 课时</td>';
+                    html += '<td style="color:#10b981;font-weight:600;">¥' + (c.price || 0) + '</td>';
+                    html += '<td>' + (c.teacher || '-') + '</td>';
+                    html += '<td><button class="btn btn-sm btn-outline-primary me-1" onclick="editCourse(' + c.id + ')"><i class="fas fa-edit"></i></button>';
+                    html += '<button class="btn btn-sm btn-outline-danger" onclick="deleteCourse(' + c.id + ')"><i class="fas fa-trash"></i></button></td></tr>';
+                });
+            }
+            $('#courseList').html(html);
+            $('#pageInfo').text('共 ' + total + ' 条记录');
+            renderPagination();
+        }
+    });
+}
+
+function renderPagination(){
+    if(totalPages <= 1){ $('#pagination').html(''); return; }
+    var html = '<li class="page-item ' + (currentPage <= 1 ? 'disabled' : '') + '"><a class="page-link" href="javascript:void(0)" onclick="loadCourses(' + (currentPage-1) + ')">上一页</a></li>';
+    for(var i = 1; i <= totalPages; i++){
+        if(i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)){
+            html += '<li class="page-item ' + (i === currentPage ? 'active' : '') + '"><a class="page-link" href="javascript:void(0)" onclick="loadCourses(' + i + ')">' + i + '</a></li>';
+        } else if(i === currentPage - 3 || i === currentPage + 3){
+            html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+    html += '<li class="page-item ' + (currentPage >= totalPages ? 'disabled' : '') + '"><a class="page-link" href="javascript:void(0)" onclick="loadCourses(' + (currentPage+1) + ')">下一页</a></li>';
+    $('#pagination').html(html);
+}
+
+function openAdd(){ $('#editId').val(''); $('#modalTitle').text('新增课程'); $('#name,#category,#hours,#price,#teacher').val(''); }
+
+function editCourse(id){
+    $.get('/api/courses/' + id, function(res){
+        if(res.code === 0){
+            $('#editId').val(id); $('#modalTitle').text('编辑课程');
+            $('#name').val(res.data.name); $('#category').val(res.data.category);
+            $('#hours').val(res.data.hours); $('#price').val(res.data.price); $('#teacher').val(res.data.teacher);
+            new bootstrap.Modal($('#courseModal')).show();
+        }
+    });
+}
+
+function saveCourse(){
+    var id = $('#editId').val();
+    var data = {name:$('#name').val(), category:$('#category').val(), hours:$('#hours').val(), price:$('#price').val(), teacher:$('#teacher').val()};
+    $.ajax({url: id ? '/api/courses/' + id : '/api/courses', method: id ? 'PUT' : 'POST', contentType:'application/json', data:JSON.stringify(data), success:function(res){
+        if(res.code === 0){ bootstrap.Modal.getInstance($('#courseModal')).hide(); loadCourses(currentPage); }
+        else alert(res.msg);
+    }});
+}
+
+function deleteCourse(id){
+    if(confirm('确定删除该课程?')){
+        $.ajax({
+            url:'/api/courses/' + id,
+            method:'DELETE',
+            success:function(res){
+                if(res.code === 0) loadCourses(currentPage);
+                else alert(res.msg);
+            },
+            error:function(xhr){
+                var msg = xhr.responseJSON ? xhr.responseJSON.msg : '删除失败';
+                alert(msg);
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+{% block title %}报名缴费 - 学员管理系统{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-file-invoice-dollar"></i>报名缴费</h4>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#enrollModal">
+        <i class="fas fa-plus me-2"></i>新增报名
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选栏 -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <label class="form-label">学员</label>
+                <select class="form-select" id="filterStudent">
+                    <option value="">全部学员</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">课程</label>
+                <select class="form-select" id="filterCourse">
+                    <option value="">全部课程</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">缴费状态</label>
+                <select class="form-select" id="filterStatus">
+                    <option value="">全部状态</option>
+                    <option value="arrears">待缴费</option>
+                    <option value="paid">已缴清</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary" onclick="loadEnrolls(1)">
+                    <i class="fas fa-search me-1"></i>查询
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr><th>序号</th><th>学员</th><th>课程</th><th>应缴</th><th>已缴</th><th>欠费</th><th>状态</th><th>操作</th></tr>
+                </thead>
+                <tbody id="enrollList"></tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-muted" id="pageInfo">共 0 条记录</div>
+            <nav><ul class="pagination" id="pagination"></ul></nav>
+        </div>
+    </div>
+</div>
+
+<!-- 报名模态框 -->
+<div class="modal fade" id="enrollModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">新增报名</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">选择学员 <span class="text-danger">*</span></label>
+                    <select class="form-select" id="studentId"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">选择课程 <span class="text-danger">*</span></label>
+                    <select class="form-select" id="courseId"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" onclick="saveEnroll()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 缴费模态框 -->
+<div class="modal fade" id="payModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background:#10b981;color:#fff;">
+                <h5 class="modal-title">缴费</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="payEnrollId">
+                <div class="mb-3">
+                    <label class="form-label">缴费金额</label>
+                    <div class="input-group">
+                        <span class="input-group-text">¥</span>
+                        <input type="number" class="form-control" id="payAmount">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">支付方式</label>
+                    <select class="form-select" id="payMethod">
+                        <option value="微信">微信</option>
+                        <option value="支付宝">支付宝</option>
+                        <option value="银行卡">银行卡</option>
+                        <option value="现金">现金</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-success" onclick="savePay()">确认缴费</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+var payModal = null, currentPage = 1, totalPages = 1, perPage = 10;
+$(function(){
+    payModal = new bootstrap.Modal($('#payModal')[0]);
+    loadEnrolls(1); loadOptions();
+});
+
+function loadOptions(){
+    $.get('/api/students', {per_page:100}, function(res){
+        var html = '<option value="">请选择学员</option>';
+        var filterHtml = '<option value="">全部学员</option>';
+        if(res.data && res.data.list) res.data.list.forEach(function(s){
+            html += '<option value="'+s.id+'">'+s.name+'</option>';
+            filterHtml += '<option value="'+s.id+'">'+s.name+'</option>';
+        });
+        $('#studentId').html(html);
+        $('#filterStudent').html(filterHtml);
+    });
+    $.get('/api/courses', {per_page:100}, function(res){
+        var html = '<option value="">请选择课程</option>';
+        var filterHtml = '<option value="">全部课程</option>';
+        if(res.data && res.data.list) res.data.list.forEach(function(c){
+            html += '<option value="'+c.id+'">'+c.name+' (¥'+c.price+')</option>';
+            filterHtml += '<option value="'+c.id+'">'+c.name+'</option>';
+        });
+        $('#courseId').html(html);
+        $('#filterCourse').html(filterHtml);
+    });
+}
+
+function loadEnrolls(page){
+    currentPage = page || 1;
+    $('#enrollList').html('<tr><td colspan="8" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>加载中...</td></tr>');
+    $.get('/api/enrollments', {
+        page: currentPage,
+        per_page: perPage,
+        student_id: $('#filterStudent').val(),
+        course_id: $('#filterCourse').val(),
+        status: $('#filterStatus').val()
+    }, function(res){
+        if(res.code === 0){
+            var html = '', list = res.data.list || [], total = res.data.total || 0;
+            totalPages = Math.ceil(total / perPage) || 1;
+            if(list.length === 0){
+                html = '<tr><td colspan="8" class="text-center text-muted py-4">暂无数据</td></tr>';
+            } else {
+                list.forEach(function(e, index){
+                    var rowNum = (currentPage - 1) * perPage + index + 1;
+                    var statusClass = e.arrears > 0 ? 'warning' : 'success';
+                    var statusText = e.arrears > 0 ? '待缴费' : '已缴清';
+                    html += '<tr><td>' + rowNum + '</td>';
+                    html += '<td><strong>' + e.student_name + '</strong></td>';
+                    html += '<td>' + e.course_name + '</td>';
+                    html += '<td>¥' + e.amount + '</td>';
+                    html += '<td style="color:#10b981;">¥' + e.paid + '</td>';
+                    html += '<td style="color:' + (e.arrears > 0 ? '#ef4444' : '#6b7280') + ';font-weight:600;">¥' + e.arrears + '</td>';
+                    html += '<td><span class="badge bg-' + statusClass + '">' + statusText + '</span></td>';
+                    html += '<td>';
+                    html += '<button class="btn btn-sm btn-outline-primary me-1" onclick="openPay(' + e.id + ',' + e.arrears + ')"' + (e.arrears <= 0 ? ' disabled' : '') + '>缴费</button>';
+                    html += '<button class="btn btn-sm btn-outline-danger" onclick="deleteEnroll(' + e.id + ')"><i class="fas fa-trash"></i></button>';
+                    html += '</td></tr>';
+                });
+            }
+            $('#enrollList').html(html);
+            $('#pageInfo').text('共 ' + total + ' 条记录');
+            renderPagination();
+        }
+    });
+}
+
+function renderPagination(){
+    if(totalPages <= 1){ $('#pagination').html(''); return; }
+    var html = '<li class="page-item ' + (currentPage <= 1 ? 'disabled' : '') + '"><a class="page-link" href="javascript:void(0)" onclick="loadEnrolls(' + (currentPage-1) + ')">上一页</a></li>';
+    for(var i = 1; i <= totalPages; i++){
+        if(i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)){
+            html += '<li class="page-item ' + (i === currentPage ? 'active' : '') + '"><a class="page-link" href="javascript:void(0)" onclick="loadEnrolls(' + i + ')">' + i + '</a></li>';
+        } else if(i === currentPage - 3 || i === currentPage + 3){
+            html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+    html += '<li class="page-item ' + (currentPage >= totalPages ? 'disabled' : '') + '"><a class="page-link" href="javascript:void(0)" onclick="loadEnrolls(' + (currentPage+1) + ')">下一页</a></li>';
+    $('#pagination').html(html);
+}
+
+function saveEnroll(){
+    var studentId = $('#studentId').val(), courseId = $('#courseId').val();
+    if(!studentId || !courseId){ alert('请选择学员和课程'); return; }
+    $.ajax({url:'/api/enrollments', method:'POST', contentType:'application/json',
+        data:JSON.stringify({student_id:parseInt(studentId), course_id:parseInt(courseId)}),
+        success:function(res){
+            if(res.code === 0){ bootstrap.Modal.getInstance($('#enrollModal')[0]).hide(); loadEnrolls(currentPage); }
+            else alert(res.msg);
+        }
+    });
+}
+
+function openPay(id, arrears){
+    $('#payEnrollId').val(id); $('#payAmount').val(arrears); payModal.show();
+}
+
+function savePay(){
+    var btn = $('#payModal .btn-success');
+    btn.prop('disabled',true).html('<i class="fas fa-spinner fa-spin me-1"></i>处理中...');
+    $.ajax({
+        url:'/api/payments', method:'POST', contentType:'application/json',
+        data:JSON.stringify({enrollment_id:parseInt($('#payEnrollId').val()), amount:parseFloat($('#payAmount').val()), method:$('#payMethod').val()}),
+        success:function(res){
+            btn.prop('disabled',false).html('确认缴费');
+            if(res.code === 0){ payModal.hide(); loadEnrolls(currentPage); alert('缴费成功！收据号: ' + res.data.receipt_no); }
+            else alert(res.msg || '缴费失败');
+        },
+        error:function(){ btn.prop('disabled',false).html('确认缴费'); alert('网络错误'); }
+    });
+}
+
+function deleteEnroll(id){
+    if(confirm('确定删除该报名记录？关联的缴费记录也会被删除。')){
+        $.ajax({
+            url: '/api/enrollments/' + id,
+            method: 'DELETE',
+            success: function(res){
+                if(res.code === 0) loadEnrolls(currentPage);
+                else alert(res.msg || '删除失败');
+            },
+            error: function(){ alert('网络错误'); }
+        });
+    }
+}
+</script>
+{% endblock %}

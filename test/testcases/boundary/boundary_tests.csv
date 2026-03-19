@@ -1,0 +1,21 @@
+用例ID,测试类型,模块,用例标题,前置条件,测试步骤,测试数据,预期结果,优先级,执行方式
+TC-BOUND-001,边界,学员管理,学员年龄-最小值-应接受,已登录,"步骤1:调用POST /api/students","name=张三,age=1","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-002,边界,学员管理,学员年龄-0值-应拒绝,已登录,"步骤1:调用POST /api/students","name=张三,age=0","预期1:状态码400,msg包含年龄必须大于0",P0,自动化
+TC-BOUND-003,边界,学员管理,学员年龄-负数-应拒绝,已登录,"步骤1:调用POST /api/students","name=张三,age=-1","预期1:状态码400,msg包含年龄必须大于0",P0,自动化
+TC-BOUND-004,边界,学员管理,学员年龄-超大值-应拒绝,已登录,"步骤1:调用POST /api/students","name=张三,age=200","预期1:状态码400,msg包含年龄超出范围",P0,自动化
+TC-BOUND-005,边界,课程管理,课程课时-最小值-应接受,已登录,"步骤1:调用POST /api/courses","name=Python,hours=1,price=100","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-006,边界,课程管理,课程课时-0值-应拒绝,已登录,"步骤1:调用POST /api/courses","name=Python,hours=0,price=100","预期1:状态码400,msg包含课时必须大于0",P0,自动化
+TC-BOUND-007,边界,课程管理,课程单价-0值-应拒绝,已登录,"步骤1:调用POST /api/courses","name=Python,hours=10,price=0","预期1:状态码400,msg包含单价必须大于0",P0,自动化
+TC-BOUND-008,边界,报名缴费,缴费金额-0值-应拒绝,已登录,"步骤1:调用POST /api/payments","enrollment_id=1,amount=0","预期1:状态码400,msg包含金额必须大于0",P0,自动化
+TC-BOUND-009,边界,报名缴费,缴费金额-负数-应拒绝,已登录,"步骤1:调用POST /api/payments","enrollment_id=1,amount=-100","预期1:状态码400,msg包含金额必须大于0",P0,自动化
+TC-BOUND-010,边界,学员管理,分页参数-page=0-应返回第1页,已登录,"步骤1:调用GET /api/students","page=0,per_page=10","预期1:状态码200,返回第1页数据",P0,自动化
+TC-BOUND-011,边界,学员管理,分页参数-page负数-应拒绝,已登录,"步骤1:调用GET /api/students","page=-1,per_page=10","预期1:状态码400,msg包含页码无效",P0,自动化
+TC-BOUND-012,边界,学员管理,分页参数-per_page超大-应限制,已登录,"步骤1:调用GET /api/students","page=1,per_page=10000","预期1:状态码200,最多返回1000条",P0,自动化
+TC-BOUND-013,边界,学员管理,姓名长度-1字符-应接受,已登录,"步骤1:调用POST /api/students","name=张,age=20","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-014,边界,学员管理,姓名长度-50字符-应接受,已登录,"步骤1:调用POST /api/students","name=50个字符,age=20","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-015,边界,学员管理,姓名长度-超长-应拒绝,已登录,"步骤1:调用POST /api/students","name=200个字符,age=20","预期1:状态码400,msg包含姓名长度超限",P0,自动化
+TC-BOUND-016,边界,课程管理,课程单价-最大值-应接受,已登录,"步骤1:调用POST /api/courses","name=Python,hours=10,price=999999","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-017,边界,课程管理,课程课时-最大值-应接受,已登录,"步骤1:调用POST /api/courses","name=Python,hours=1000,price=1000","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-018,边界,报名缴费,缴费金额-小数-应接受,已登录,"步骤1:调用POST /api/payments","enrollment_id=1,amount=99.99","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-019,边界,考勤管理,日期-当天-应接受,已登录,"步骤1:调用POST /api/attendances","student_id=1,course_id=1,date=今天","预期1:状态码201,创建成功",P0,自动化
+TC-BOUND-020,边界,考勤管理,日期-历史最早-应接受,已登录,"步骤1:调用POST /api/attendances","student_id=1,course_id=1,date=2020-01-01","预期1:状态码201,创建成功",P0,自动化

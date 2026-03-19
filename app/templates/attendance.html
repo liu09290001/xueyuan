@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}考勤管理 - 学员管理系统{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h4><i class="fas fa-calendar-check"></i>考勤管理</h4>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#attModal">
+        <i class="fas fa-plus me-2"></i>录入考勤
+    </button>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <!-- 筛选栏 -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-2">
+                <label class="form-label">选择学员</label>
+                <select class="form-select" id="studentId">
+                    <option value="">全部学员</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">选择课程</label>
+                <select class="form-select" id="courseId">
+                    <option value="">全部课程</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">开始日期</label>
+                <input type="date" class="form-control" id="startDate">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">结束日期</label>
+                <input type="date" class="form-control" id="endDate">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">考勤状态</label>
+                <select class="form-select" id="attStatus">
+                    <option value="">全部状态</option>
+                    <option value="出勤">出勤</option>
+                    <option value="缺勤">缺勤</option>
+                    <option value="迟到">迟到</option>
+                    <option value="请假">请假</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary" onclick="loadAttendance()">
+                    <i class="fas fa-search me-1"></i>查询
+                </button>
+            </div>
+        </div>
+
+        <!-- 快捷时间选择 -->
+        <div class="mb-4">
+            <span class="text-muted me-2">快捷选择:</span>
+            <button class="btn btn-sm btn-outline-secondary me-1" onclick="setDateRange(0)">今天</button>
+            <button class="btn btn-sm btn-outline-secondary me-1" onclick="setDateRange(7)">最近7天</button>
+            <button class="btn btn-sm btn-outline-secondary me-1" onclick="setDateRange(30)">最近30天</button>
+        </div>
+
+        <!-- 表格 -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr><th>日期</th><th>学员</th><th>课程</th><th>状态</th></tr>
+                </thead>
+                <tbody id="attList"></tbody>
+            </table>
+        </div>
+
+        <!-- 分页 -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div class="text-muted" id="pageInfo">共 0 条记录</div>
+            <nav><ul class="pagination" id="pagination"></ul></nav>
+        </div>
+    </div>
+</div>
+
+<!-- 考勤录入模态框 -->
+<div class="modal fade" id="attModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">录入考勤</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">选择学员 <span class="text-danger">*</span></label>
+                    <select class="form-select" id="attStudentId"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">选择课程 <span class="text-danger">*</span></label>
+                    <select class="form-select" id="attCourseId"></select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">日期 <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="attDate">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">考勤状态</label>
+                    <select class="form-select" id="attStatusSel">
+                        <option value="出勤">出勤</option>
+                        <option value="缺勤">缺勤</option>
+                        <option value="迟到">迟到</option>
+                        <option value="请假">请假</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button class="btn btn-primary" onclick="saveAttendance()">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+var currentPage = 1, totalPages = 1, perPage = 10;
+var studentList = [], courseList = [];
+
+$(function(){
+    setDateRange(7);
+    loadOptions();
+    loadAttendance();
+    // 模态框打开时重置表单
+    $('#attModal').on('show.bs.modal', function(){
+        $('#attStudentId').val('');
+        $('#attCourseId').html('<option value="">请先选择学员</option>');
+        $('#attDate').val(new Date().toISOString().split('T')[0]);
+        $('#attStatusSel').val('出勤');
+    });
+});
+
+function setDateRange(days){
+    var today = new Date();
+    var start = new Date();
+    start.setDate(today.getDate() - days);
+    $('#endDate').val(today.toISOString().split('T')[0]);
+    $('#startDate').val(start.toISOString().split('T')[0]);
+}
+
+function loadOptions(){
+    // 加载学员列表（筛选栏）
+    $.get('/api/students', {per_page:100}, function(res){
+        var html = '<option value="">全部学员</option>';
+        var modalHtml = '<option value="">请选择学员</option>';
+        if(res.data && res.data.list){
+            studentList = res.data.list;
+            res.data.list.forEach(function(s){
+                html += '<option value="'+s.id+'">'+s.name+'</option>';
+                modalHtml += '<option value="'+s.id+'">'+s.name+'</option>';
+            });
+        }
+        $('#studentId').html(html);
+        $('#attStudentId').html(modalHtml);
+    });
+    // 加载课程列表（筛选栏）
+    $.get('/api/courses', {per_page:100}, function(res){
+        var html = '<option value="">全部课程</option>';
+        if(res.data && res.data.list){
+            courseList = res.data.list;
+            res.data.list.forEach(function(c){
+                html += '<option value="'+c.id+'">'+c.name+'</option>';
+            });
+        }
+        $('#courseId').html(html);
+    });
+}
+
+// 学员选择后加载其已报名课程（录入模态框）
+$('#attStudentId').on('change', function(){
+    var sid = $(this).val();
+    if(!sid){
+        $('#attCourseId').html('<option value="">请先选择学员</option>');
+        return;
+    }
+    $.get('/api/students/'+sid+'/enrolled-courses', function(res){
+        var html = '<option value="">请选择课程</option>';
+        if(res.data && res.data.length > 0){
+            res.data.forEach(function(c){
+                html += '<option value="'+c.id+'">'+c.name+'</option>';
+            });
+        } else {
+            html = '<option value="">该学员暂无报名课程</option>';
+        }
+        $('#attCourseId').html(html);
+    });
+});
+
+function loadAttendance(page){
+    currentPage = page || 1;
+    $('#attList').html('<tr><td colspan="4" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>加载中...</td></tr>');
+
+    $.get('/api/attendances', {
+        student_id: $('#studentId').val(),
+        course_id: $('#courseId').val(),
+        start_date: $('#startDate').val(),
+        end_date: $('#endDate').val(),
+        status: $('#attStatus').val(),
+        page: currentPage, per_page: perPage
+    }, function(res){
+        var html = '', list = res.data.list || [], total = res.data.total || 0;
+        totalPages = Math.ceil(total / perPage) || 1;
+
+        if(list.length === 0){
+            html = '<tr><td colspan="4" class="text-center text-muted py-4">暂无考勤记录</td></tr>';
+        } else {
+            list.forEach(function(a){
+                var statusClass = {'出勤':'success','请假':'warning','缺勤':'danger','迟到':'info'}[a.status] || 'secondary';
+                html += '<tr>';
+                html += '<td>' + a.date + '</td>';
+                html += '<td><strong>' + a.student_name + '</strong></td>';
+                html += '<td>' + a.course_name + '</td>';
+                html += '<td><span class="badge bg-' + statusClass + '">' + a.status + '</span></td>';
+                html += '</tr>';
+            });
+        }
+        $('#attList').html(html);
+        $('#pageInfo').text('共 ' + total + ' 条记录');
+        renderPagination();
+    }).fail(function(){
+        $('#attList').html('<tr><td colspan="4" class="text-center text-danger py-4">加载失败</td></tr>');
+    });
+}
+
+function renderPagination(){
+    if(totalPages <= 1){ $('#pagination').html(''); return; }
+    var html = '';
+    html += '<li class="page-item ' + (currentPage <= 1 ? 'disabled' : '') + '">';
+    html += '<a class="page-link" href="javascript:void(0)" onclick="loadAttendance(' + (currentPage-1) + ')">上一页</a></li>';
+    for(var i = 1; i <= totalPages; i++){
+        if(i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)){
+            html += '<li class="page-item ' + (i === currentPage ? 'active' : '') + '">';
+            html += '<a class="page-link" href="javascript:void(0)" onclick="loadAttendance(' + i + ')">' + i + '</a></li>';
+        } else if(i === currentPage - 3 || i === currentPage + 3){
+            html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+        }
+    }
+    html += '<li class="page-item ' + (currentPage >= totalPages ? 'disabled' : '') + '">';
+    html += '<a class="page-link" href="javascript:void(0)" onclick="loadAttendance(' + (currentPage+1) + ')">下一页</a></li>';
+    $('#pagination').html(html);
+}
+
+function saveAttendance(){
+    var data = {
+        student_id: parseInt($('#attStudentId').val()),
+        course_id: parseInt($('#attCourseId').val()),
+        date: $('#attDate').val(),
+        status: $('#attStatusSel').val()
+    };
+    if(!data.student_id || !data.course_id || !data.date){
+        alert('请填写完整信息'); return;
+    }
+    $.ajax({
+        url: '/api/attendances', method: 'POST',
+        contentType: 'application/json', data: JSON.stringify(data),
+        success: function(res){
+            if(res.code === 0){
+                bootstrap.Modal.getInstance($('#attModal')[0]).hide();
+                loadAttendance(currentPage);
+            } else { alert(res.msg || '保存失败'); }
+        },
+        error: function(){ alert('网络错误'); }
+    });
+}
+</script>
+{% endblock %}
