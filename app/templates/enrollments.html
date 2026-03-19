@@ -2,7 +2,10 @@
 {% block title %}报名缴费 - 学员管理系统{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h4><i class="fas fa-file-invoice-dollar"></i>报名缴费</h4>
+    <div>
+        <h4><i class="fas fa-file-invoice-dollar"></i>报名缴费</h4>
+        <p class="page-subtitle">报名、欠费和缴费状态统一纳入柔和粉绿配色体系，重点信息更易区分。</p>
+    </div>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#enrollModal">
         <i class="fas fa-plus me-2"></i>新增报名
     </button>
@@ -83,9 +86,9 @@
 <div class="modal fade" id="payModal">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background:#10b981;color:#fff;">
+            <div class="modal-header modal-header-emerald">
                 <h5 class="modal-title">缴费</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="payEnrollId">
@@ -169,8 +172,8 @@ function loadEnrolls(page){
                     html += '<td><strong>' + e.student_name + '</strong></td>';
                     html += '<td>' + e.course_name + '</td>';
                     html += '<td>¥' + e.amount + '</td>';
-                    html += '<td style="color:#10b981;">¥' + e.paid + '</td>';
-                    html += '<td style="color:' + (e.arrears > 0 ? '#ef4444' : '#6b7280') + ';font-weight:600;">¥' + e.arrears + '</td>';
+                    html += '<td><span class="money-positive">¥' + e.paid + '</span></td>';
+                    html += '<td><span class="' + (e.arrears > 0 ? 'money-negative' : 'money-muted') + '">¥' + e.arrears + '</span></td>';
                     html += '<td><span class="badge bg-' + statusClass + '">' + statusText + '</span></td>';
                     html += '<td>';
                     html += '<button class="btn btn-sm btn-outline-primary me-1" onclick="openPay(' + e.id + ',' + e.arrears + ')"' + (e.arrears <= 0 ? ' disabled' : '') + '>缴费</button>';
