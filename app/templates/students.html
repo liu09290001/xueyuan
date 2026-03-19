@@ -2,7 +2,10 @@
 {% block title %}学员管理 - 学员管理系统{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h4><i class="fas fa-users"></i>学员管理</h4>
+    <div>
+        <h4><i class="fas fa-users"></i>学员管理</h4>
+        <p class="page-subtitle">统一为柔和粉调卡片、圆角表单和轻玻璃质感，功能逻辑保持不变。</p>
+    </div>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentModal" onclick="openAdd()">
         <i class="fas fa-plus me-2"></i>新增学员
     </button>
@@ -140,7 +143,7 @@ function loadStudents(page){
                     html += '<td>' + (s.gender || '-') + '</td>';
                     html += '<td>' + (s.age || '-') + '</td>';
                     html += '<td>' + (s.phone || '-') + '</td>';
-                    html += '<td><span class="badge bg-' + statusClass + '" style="cursor:pointer;" onclick="changeStatus(' + s.id + ',\'' + s.status + '\')">' + s.status + ' <i class="fas fa-caret-down ms-1"></i></span></td>';
+                    html += '<td><span class="badge bg-' + statusClass + ' status-toggle-badge" onclick="changeStatus(' + s.id + ',\'' + s.status + '\')">' + s.status + ' <i class="fas fa-caret-down ms-1"></i></span></td>';
                     html += '<td>' + s.created_at + '</td>';
                     html += '<td>';
                     html += '<button class="btn btn-sm btn-outline-primary me-1" onclick="editStudent(' + s.id + ')"><i class="fas fa-edit"></i></button>';

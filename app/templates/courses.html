@@ -2,7 +2,10 @@
 {% block title %}课程管理 - 学员管理系统{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h4><i class="fas fa-book-open"></i>课程管理</h4>
+    <div>
+        <h4><i class="fas fa-book-open"></i>课程管理</h4>
+        <p class="page-subtitle">课程列表、筛选和弹窗统一切换到同一套少女风主题语义样式。</p>
+    </div>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#courseModal" onclick="openAdd()">
         <i class="fas fa-plus me-2"></i>新增课程
     </button>
@@ -19,7 +22,7 @@
                 </div>
             </div>
             <div class="col-md-2">
-                <select class="form-select" id="category">
+                <select class="form-select" id="filterCategory">
                     <option value="">全部类别</option>
                 </select>
             </div>
@@ -62,7 +65,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">类别</label>
-                        <input type="text" class="form-control" id="category" placeholder="如：编程、美术">
+                        <input type="text" class="form-control" id="courseCategory" placeholder="如：编程、美术">
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">课时</label>
@@ -104,7 +107,7 @@ function loadCategories(){
         }
         var html = '<option value="">全部类别</option>';
         Object.keys(cats).forEach(function(c){ html += '<option value="'+c+'">'+c+'</option>'; });
-        $('#category').html(html);
+        $('#filterCategory').html(html);
     });
 }
 
@@ -113,7 +116,7 @@ function loadCourses(page){
     $('#courseList').html('<tr><td colspan="7" class="text-center py-4"><i class="fas fa-spinner fa-spin me-2"></i>加载中...</td></tr>');
     $.get('/api/courses', {
         page: currentPage, per_page: perPage,
-        keyword: $('#keyword').val(), category: $('#category').val()
+        keyword: $('#keyword').val(), category: $('#filterCategory').val()
     }, function(res){
         if(res.code === 0){
             var html = '', list = res.data.list, total = res.data.total || list.length;
@@ -127,7 +130,7 @@ function loadCourses(page){
                     html += '<td><strong>' + c.name + '</strong></td>';
                     html += '<td><span class="badge bg-info">' + (c.category || '-') + '</span></td>';
                     html += '<td>' + (c.hours || '-') + ' 课时</td>';
-                    html += '<td style="color:#10b981;font-weight:600;">¥' + (c.price || 0) + '</td>';
+                    html += '<td><span class="money-positive">¥' + (c.price || 0) + '</span></td>';
                     html += '<td>' + (c.teacher || '-') + '</td>';
                     html += '<td><button class="btn btn-sm btn-outline-primary me-1" onclick="editCourse(' + c.id + ')"><i class="fas fa-edit"></i></button>';
                     html += '<button class="btn btn-sm btn-outline-danger" onclick="deleteCourse(' + c.id + ')"><i class="fas fa-trash"></i></button></td></tr>';
@@ -154,13 +157,13 @@ function renderPagination(){
     $('#pagination').html(html);
 }
 
-function openAdd(){ $('#editId').val(''); $('#modalTitle').text('新增课程'); $('#name,#category,#hours,#price,#teacher').val(''); }
+function openAdd(){ $('#editId').val(''); $('#modalTitle').text('新增课程'); $('#name,#courseCategory,#hours,#price,#teacher').val(''); }
 
 function editCourse(id){
     $.get('/api/courses/' + id, function(res){
         if(res.code === 0){
             $('#editId').val(id); $('#modalTitle').text('编辑课程');
-            $('#name').val(res.data.name); $('#category').val(res.data.category);
+            $('#name').val(res.data.name); $('#courseCategory').val(res.data.category);
             $('#hours').val(res.data.hours); $('#price').val(res.data.price); $('#teacher').val(res.data.teacher);
             new bootstrap.Modal($('#courseModal')).show();
         }
@@ -169,7 +172,7 @@ function editCourse(id){
 
 function saveCourse(){
     var id = $('#editId').val();
-    var data = {name:$('#name').val(), category:$('#category').val(), hours:$('#hours').val(), price:$('#price').val(), teacher:$('#teacher').val()};
+    var data = {name:$('#name').val(), category:$('#courseCategory').val(), hours:$('#hours').val(), price:$('#price').val(), teacher:$('#teacher').val()};
     $.ajax({url: id ? '/api/courses/' + id : '/api/courses', method: id ? 'PUT' : 'POST', contentType:'application/json', data:JSON.stringify(data), success:function(res){
         if(res.code === 0){ bootstrap.Modal.getInstance($('#courseModal')).hide(); loadCourses(currentPage); }
         else alert(res.msg);

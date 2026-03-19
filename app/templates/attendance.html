@@ -2,7 +2,10 @@
 {% block title %}考勤管理 - 学员管理系统{% endblock %}
 {% block content %}
 <div class="page-header">
-    <h4><i class="fas fa-calendar-check"></i>考勤管理</h4>
+    <div>
+        <h4><i class="fas fa-calendar-check"></i>考勤管理</h4>
+        <p class="page-subtitle">查询区、快捷筛选和录入弹窗都统一为圆润、轻盈、可读性更高的主题样式。</p>
+    </div>
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#attModal">
         <i class="fas fa-plus me-2"></i>录入考勤
     </button>
@@ -52,9 +55,11 @@
         <!-- 快捷时间选择 -->
         <div class="mb-4">
             <span class="text-muted me-2">快捷选择:</span>
-            <button class="btn btn-sm btn-outline-secondary me-1" onclick="setDateRange(0)">今天</button>
-            <button class="btn btn-sm btn-outline-secondary me-1" onclick="setDateRange(7)">最近7天</button>
-            <button class="btn btn-sm btn-outline-secondary me-1" onclick="setDateRange(30)">最近30天</button>
+            <div class="quick-actions mt-2">
+                <button class="btn btn-sm btn-outline-secondary shortcut-chip" onclick="setDateRange(0)">今天</button>
+                <button class="btn btn-sm btn-outline-secondary shortcut-chip" onclick="setDateRange(7)">最近7天</button>
+                <button class="btn btn-sm btn-outline-secondary shortcut-chip" onclick="setDateRange(30)">最近30天</button>
+            </div>
         </div>
 
         <!-- 表格 -->
